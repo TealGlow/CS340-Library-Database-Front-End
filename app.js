@@ -213,7 +213,7 @@ app.get("/sections.html", (req, res)=>{
 
 
 /*
-      FUNCTIONS TO HANDLE THE SEARCH OF AUTHORS AND SEARCH OF BOOK SBY AUTHORS
+      FUNCTIONS TO HANDLE THE SEARCH OF AUTHORS AND SEARCH OF BOOK BY AUTHORS
 */
 
 app.get("/authors.html", (req, res)=>{
