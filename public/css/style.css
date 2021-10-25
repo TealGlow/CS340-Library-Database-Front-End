@@ -1,0 +1,109 @@
+/*
+ Styles
+*/
+
+
+
+html,body{
+  height:100%;
+  width:100%;
+  overflow:hidden;
+}
+
+
+
+.navbar{
+  position:fixed;
+  width:100%;
+  padding-left:20px;
+  padding-right:20px;
+  z-index:999;
+}
+
+
+
+/*
+      MAIN ALL PAGES STYLING
+*/
+
+
+
+.myContainer{
+  height:100%;
+  width:100%;
+  overflow-y: auto;
+}
+
+
+
+.main-container{
+  height:80%;
+}
+
+
+
+.hidden{
+  /*
+    Hides an element, I used this to hide elements in a form.
+  */
+  display:none;
+}
+
+
+
+.center{
+  /*
+  centers an element according to the parent size
+  */
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+.element-col{
+  /*
+    Changes the flex direction to column so that this with
+    center will center according to column
+  */
+  flex-direction: column;
+}
+
+
+.single-item{
+  /*
+    styling for a single element, this is the style for each book item
+    and each section item.
+  */
+  width:600px;
+  padding:2rem 3rem;
+  margin:15px;
+  background-color:lightgray;
+}
+
+
+
+/*
+        BOOK PAGE SPECIFIC STYLING
+*/
+
+
+
+.avail{
+  /*
+    Styling for the available item font
+  */
+  font-size:1.2rem;
+  color:green;
+}
+
+
+
+.not-avail{
+  /*
+    Styling for the not available item font.
+  */
+  font-size:1.2rem;
+  color:red;
+}

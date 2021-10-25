@@ -1,0 +1,23 @@
+<%- include ("../partials/header") %>
+<div class="myContainer element-col center">
+
+  <!--
+    simple display page to show the user that they checked out a book
+
+    this page will be changed when we handle more stuff in the back-end
+  -->
+  
+  <h1>Successfully checked out!</h1>
+  <br/>
+  <div>
+    First Name:<%=data.firstName%>
+    <br/>
+    Last Name: <%=data.lastName%>
+    <br/>
+    Book ID: <%=data.book_id%>
+    <br/>
+    Title: <%=data.title%>
+  </div>
+
+</div>
+<%- include ("../partials/footer") %>

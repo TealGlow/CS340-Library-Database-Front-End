@@ -1,0 +1,35 @@
+<%- include ("../partials/header") %>
+
+      <div class="myContainer center element-col">
+        <!--
+        Right now I have it so that it has links to these pages
+        Ideally the books.html page would take the user to the result of the search that that
+        displays the results
+        -->
+
+        <!-- still working on this form-->
+        <form class="single-item" method="POST">
+          <h1>Search our catalog</h1>
+          <label for="title">Book Title</label>
+          <input type="text" name="title">
+          <button type="submit" class="btn btn-dark">Search!</button>
+        </form>
+
+        <br/>
+        <ul>
+          <!-- Displays the results of the books search, right now shows all books -->
+          <li><a href="/books.html">All Books</a> - Shows all the books in the library, fake data right now</li>
+          <!-- displays the results of a search based on book title-->
+          <li><a href="/books.html">Search Books Title</a> - Shows all the books in the library, fake data right now</li>
+          <!-- displays the section search, right now displays all sections -->
+          <li><a href="/Sections.html">All Sections</a> - Shows all the sections in the library and how many books are in them, fake data right now.</li>
+          <!-- displays the author search, right now displays all authors -->
+          <li><a href="/Authors.html">All Authors</a></li>
+          <!-- displays the publishers search, right now displays all the publishers -->
+          <li><a href="/Publishers.html">All Publishers</a></li>
+          <!-- displays the patron search, right now displauys all the patrons-->
+          <li><a href="/Patrons.html">All Patrons</a></li>
+        </ul>
+      </div>
+
+<%- include ("../partials/footer") %>

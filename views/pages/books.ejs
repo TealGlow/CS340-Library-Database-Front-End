@@ -1,0 +1,46 @@
+<%- include ("../partials/header") %>
+
+<!--
+
+  page that displays all the books in the library
+
+  Ideally we would use this to display the results of a user search.
+
+-->
+
+<div class="myContainer element-col center">
+  <div class="main-container">
+    <% if(data !=""){%>
+      <% for(var i=0; i < data.length; i++){%>
+        <div class="single-item" id=<%"book"+data[i].book_id%> >
+          <h1><strong><%= data[i].title %></strong></h1>
+          <strong>Id:</strong> <%= data[i].book_id %> <br/>
+          <strong>ISBN:</strong> <%= data[i].isbn %> <br/>
+          <strong>Pages:</strong> <%= data[i].pages %> <br/>
+          <strong>Publication date:</strong> <%= data[i].publication %> <br/>
+          <strong>Publisher id:</strong> <%= data[i].publisher_id %> <br/>
+          <% if(data[i].on_shelf == true){ %>
+            <!-- status available -->
+            <div class="avail"><strong>On Shelf!</strong></div>
+            <!-- user can check out the book -->
+              <form class="" action="/handleCheckOut.html" method="POST">
+                  <!-- post will get the book id that the user wants to check out-->
+                  <input class= "hidden" name="title" value = "<%=data[i].title%>">
+                  <input class= "hidden" name="book_id" value = <%= data[i].book_id %>>
+                  <input class= "hidden" name="on_shelf" value = "<%= data[i].on_shelf %>">
+                  <button type="submit" class="btn btn-dark">Check out!</button>
+              </form>
+          <% }else{ %>
+            <div class="not-avail"><strong>Out-Of-Stock.</strong></div>
+          <% } %>
+
+
+        </div>
+      <br/>
+    <%}%>
+
+  <%}%>
+  </div>
+</div>
+
+<%- include ("../partials/footer") %>
