@@ -7,8 +7,25 @@
     display a single patron with all the books they have checked out.
   -->
 
-<div class="myContainer center">
-  patrons
+<div class="myContainer element-col center">
+  <div class="main-container">
+
+    <% if(data !=""){%>
+
+      <% for(var i=0; i < data.length; i++){%>
+
+        <div class="single-item" id=<% "Patron " + data[i].patron_id %> >
+          <h1><strong><%= data[i].first_name + " " + data[i].last_name %></strong></h1>
+          <strong>phone: </strong> <%= data[i].phone %> <br/>
+          <strong>address: </strong> <%= data[i].address %> <br/>
+        </div>
+        <br/>
+
+      <%}%>
+
+    <%}%>
+
+  </div>
 </div>
 
 <%- include ("../partials/footer") %>

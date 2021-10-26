@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
-const PORT = 3000;
+const PORT = 1487;
 
 // set up ejs as the view engine
 app.set('view engine', 'ejs');
@@ -66,7 +66,7 @@ app.get("/handleCheckOut.html", (req,res)=>{
 
 
 
-app.post("/validateFormCheckOut", (req,res)=>{
+app.post("/validateFormCheckOut", (req,res)=>{   
   // validates the form, if there is an error we send the user an error.
 
   // function that removes special characters from the user input
@@ -98,7 +98,7 @@ app.post("/validateFormCheckOut", (req,res)=>{
     console.log("sending to success");
     res.render("pages/success.ejs", {data:data});
   }
-});
+});  /*validateFormCheckout*/
 
 
 
@@ -142,16 +142,41 @@ app.get("/books.html", (req, res)=>{
 
   // renders the page with the ejs templating using the tempBooks data above
   res.render("pages/books.ejs", {data:tempBook});
-});
+});  /*books.html*/
 
 
 
 /*
       FUNCTIONS TO HANDLE THE ADDITION AND SEARCH OF A PATRON.
 */
-app.get("/patrons.html", (req, res)=>{
-  // serving up the patrons page
-  res.render("pages/patrons.ejs");
+app.get("/patrons.html", (req, res) => {
+
+    var tempPatrons = [
+        {
+            patron_id: 1,
+            first_name: "Tony",
+            last_name: "Stark",
+            address: "1234 56th Ave, New York, NY 98765",
+            phone: "555-511-2433"
+        },
+        {
+            patron_id: 2,
+            first_name: "Bruce",
+            last_name: "Banner",
+            address: "7890 42nd Ave, New York, NY 98765",
+            phone: "555-424-6657"
+        },
+        {
+            patron_id: 3,
+            first_name: "Steve",
+            last_name: "Rogers",
+            address: "3857 26th Ave, New York, NY 98765",
+            phone: "555-243-7345"
+        }
+    ]
+
+    // serving up the patrons page
+    res.render("pages/patrons.ejs", {data:tempPatrons});
 });
 
 
@@ -160,9 +185,25 @@ app.get("/patrons.html", (req, res)=>{
       FUNCTIONS TO HANDLE THE SEARCH OF PUBLISHERS AND SEARCH OF BOOK BY PUBLISHERS
 */
 
-app.get("/publishers.html", (req, res)=>{
+app.get("/publishers.html", (req, res) => {
+
+    var tempPublishers = [
+        {
+            publisher_id: 1,
+            company_name: "Penguin"
+        },
+        {
+            publisher_id: 2,
+            company_name: "Macmillan"
+        },
+        {
+            publisher_id: 3,
+            company_name: "Harper Collins"
+        }
+    ]
+
   // serving up the publishers page
-  res.render("pages/publishers.ejs");
+    res.render("pages/publishers.ejs", { data: tempPublishers } );
 });
 
 
@@ -216,8 +257,27 @@ app.get("/sections.html", (req, res)=>{
       FUNCTIONS TO HANDLE THE SEARCH OF AUTHORS AND SEARCH OF BOOK BY AUTHORS
 */
 
-app.get("/authors.html", (req, res)=>{
-  res.render("pages/authors.ejs");
+app.get("/authors.html", (req, res) => {
+
+    var tempAuthors = [
+        {
+            author_id: 1,
+            first_name: "Mark",
+            last_name: "Twain"
+        },
+        {
+            author_id: 2,
+            first_name: "Charles",
+            last_name: "Dickens"
+        },
+        {
+            author_id: 3,
+            first_name: "John",
+            last_name: "Steinbeck"
+        }
+    ]
+
+    res.render("pages/authors.ejs", { data: tempAuthors } );
 });
 
 
