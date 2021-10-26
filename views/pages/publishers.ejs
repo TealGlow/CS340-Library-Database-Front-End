@@ -7,8 +7,26 @@
   Ideally we would allow the user to search based on publisher
 -->
 
-<div class="myContainer center">
-  publishers
+<div class="myContainer element-col center">
+  <div class="main-container">
+
+    <% if(data !=""){%>
+
+      <% for(var i=0; i < data.length; i++){%>
+
+        <div class="single-item" id=<% data[i].publisher_id %> >
+            <h1><strong><%= data[i].company_name %></strong></h1>
+            <form>
+                <button type="Submit" class="btn btn-dark"> See books published by <%= data[i].company_name %> </button>
+            </form>
+        </div>
+        <br/>
+
+      <%}%>
+
+    <%}%>
+
+  </div>
 </div>
 
 <%- include ("../partials/footer") %>

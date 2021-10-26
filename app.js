@@ -154,7 +154,32 @@ app.get("/books.html", (req, res)=>{
 */
 app.get("/patrons.html", (req, res)=>{
   // serving up the patrons page
-  res.render("pages/patrons.ejs");
+    var tempPatrons = [
+        {
+            patron_id: 1,
+            first_name: "Tony",
+            last_name: "Stark",
+            address: "1234 56th Ave, New York, NY 98765",
+            phone: "555-511-2433"
+        },
+        {
+            patron_id: 2,
+            first_name: "Bruce",
+            last_name: "Banner",
+            address: "7890 42nd Ave, New York, NY 98765",
+            phone: "555-424-6657"
+        },
+        {
+            patron_id: 3,
+            first_name: "Steve",
+            last_name: "Rogers",
+            address: "3857 26th Ave, New York, NY 98765",
+            phone: "555-243-7345"
+        }
+    ]
+
+    // serving up the patrons page
+    res.render("pages/patrons.ejs", {data:tempPatrons});
 });
 
 
@@ -164,8 +189,23 @@ app.get("/patrons.html", (req, res)=>{
 */
 
 app.get("/publishers.html", (req, res)=>{
-  // serving up the publishers page
-  res.render("pages/publishers.ejs");
+  var tempPublishers = [
+        {
+            publisher_id: 1,
+            company_name: "Penguin"
+        },
+        {
+            publisher_id: 2,
+            company_name: "Macmillan"
+        },
+        {
+            publisher_id: 3,
+            company_name: "Harper Collins"
+        }
+    ]
+
+    // serving up the publishers page
+    res.render("pages/publishers.ejs", { data: tempPublishers } );
 });
 
 
@@ -173,6 +213,7 @@ app.get("/publishers.html", (req, res)=>{
 /*
       FUNCTION TO HANDLE THE SEARCH OF SECTIONS AND SEARCH OF BOOKS BY SECTIONS
 */
+
 
 app.get("/sections.html", (req, res)=>{
   // for now this displays all the sections with fake data.
@@ -182,31 +223,31 @@ app.get("/sections.html", (req, res)=>{
 
   // this is where the query would go for showing all sections though
   var tempSections =[
-    {
-      section_id:1,
-      section_name:"Science",
-      number_of_books:10
-    },
-    {
-      section_id:2,
-      section_name:"Art",
-      number_of_books:2
-    },
-    {
-      section_id:3,
-      section_name:"Computer Science",
-      number_of_books:150
-    },
-    {
-      section_id:4,
-      section_name:"Fiction",
-      number_of_books:150
-    },
-    {
-      section_id:5,
-      section_name:"Non-Fiction",
-      number_of_books:150
-    }
+      {
+        section_id:1,
+        section_name:"Science",
+        number_of_books:10
+      },
+      {
+        section_id:2,
+        section_name:"Art",
+        number_of_books:2
+      },
+      {
+        section_id:3,
+        section_name:"Computer Science",
+        number_of_books:150
+      },
+      {
+        section_id:4,
+        section_name:"Fiction",
+        number_of_books:150
+      },
+      {
+        section_id:5,
+        section_name:"Non-Fiction",
+        number_of_books:150
+      }
   ];
 
   // renders the sections page with the data above.
@@ -220,7 +261,26 @@ app.get("/sections.html", (req, res)=>{
 */
 
 app.get("/authors.html", (req, res)=>{
-  res.render("pages/authors.ejs");
+  
+    var tempAuthors = [
+        {
+            author_id: 1,
+            first_name: "Mark",
+            last_name: "Twain"
+        },
+        {
+            author_id: 2,
+            first_name: "Charles",
+            last_name: "Dickens"
+        },
+        {
+            author_id: 3,
+            first_name: "John",
+            last_name: "Steinbeck"
+        }
+    ];
+
+    res.render("pages/authors.ejs", { data: tempAuthors } );
 });
 
 
