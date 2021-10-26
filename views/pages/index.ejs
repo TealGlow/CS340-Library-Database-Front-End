@@ -10,9 +10,15 @@
         <!-- still working on this form-->
         <form class="single-item" method="POST">
           <h1>Search our catalog</h1>
-          <label for="title">Book Title</label>
-          <input class="form-control" type="text" name="title">
-          <br/>
+          <label for="cars">Search by: </label>
+          <select name="search_by" id="search">
+            <option value="Keyword">Keyword</option>
+            <option value="Title">Title</option>
+            <option value="Author">Author</option>
+            <option value="Publisher">Publisher</option>
+            <option value="Genre">Genre</option>
+          </select>
+          <input type="text" name="title">
           <button type="submit" class="btn btn-dark">Search!</button>
         </form>
 
@@ -25,11 +31,11 @@
           <!-- displays the section search, right now displays all sections -->
           <li><a href="/Sections.html">All Sections</a> - Shows all the sections in the library and how many books are in them, fake data right now.</li>
           <!-- displays the author search, right now displays all authors -->
-          <li><a href="/Authors.html">All Authors</a></li>
+          <li><a href="/Authors.html">All Authors</a> - Shows all authors in the library, fake data right now</li>
           <!-- displays the publishers search, right now displays all the publishers -->
-          <li><a href="/Publishers.html">All Publishers</a></li>
+          <li><a href="/Publishers.html">All Publishers</a> - Shows all publishers with books in the library, fake data right now</li>
           <!-- displays the patron search, right now displauys all the patrons-->
-          <li><a href="/Patrons.html">All Patrons</a></li>
+          <li><a href="/Patrons.html">All Patrons</a> - Shows all library patrons, fake data right now</li>
         </ul>
       </div>
 
