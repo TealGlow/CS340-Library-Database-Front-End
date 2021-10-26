@@ -1,7 +1,7 @@
 <%- include ("../partials/header") %>
 
   <!--
-  
+
     Page that handles the user check out book form.
 
     Has form validation on the server end.
@@ -14,10 +14,10 @@
 
       <hr/>
       <label for="firstName">First Name:</label>
-      <input name="firstName" placeholder="name">
+      <input class="form-control" name="firstName" placeholder="name">
       <br/>
       <label for="lastName">Last Name:</label>
-      <input name="lastName" placeholder="name">
+      <input class="form-control" name="lastName" placeholder="name">
       <br/>
       <input class="hidden" name="book_id" value = <%=data.book_id%>>
       <input class="hidden" name="title" value = '<%=data.title%>'>
