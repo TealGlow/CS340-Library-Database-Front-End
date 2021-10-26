@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
-const PORT = 1487;
+const PORT = 3000;
 
 // set up ejs as the view engine
 app.set('view engine', 'ejs');
@@ -66,7 +66,7 @@ app.get("/handleCheckOut.html", (req,res)=>{
 
 
 
-app.post("/validateFormCheckOut", (req,res)=>{   
+app.post("/validateFormCheckOut", (req,res)=>{
   // validates the form, if there is an error we send the user an error.
 
   // function that removes special characters from the user input
@@ -96,9 +96,9 @@ app.post("/validateFormCheckOut", (req,res)=>{
     // if we cannot find that patron we should redirect them to a page to sign
     // up instead, but that can be done later.
     console.log("sending to success");
-    res.render("pages/success.ejs", {data:data});
+    res.render("pages/success.ejs", {data:data, signup:""});
   }
-});  /*validateFormCheckout*/
+});
 
 
 
@@ -118,7 +118,8 @@ app.get("/books.html", (req, res)=>{
     pages:300,
     publication:new Date(),
     publisher_id:1,
-    on_shelf:true
+    on_shelf:true,
+    section_name:"Art"
   },
   {
     book_id:2,
@@ -127,7 +128,8 @@ app.get("/books.html", (req, res)=>{
     pages:301,
     publication:new Date(),
     publisher_id:1,
-    on_shelf:false
+    on_shelf:false,
+    section_name:"Mathematics"
   },
   {
     book_id:3,
@@ -136,21 +138,22 @@ app.get("/books.html", (req, res)=>{
     pages:301,
     publication:new Date(),
     publisher_id:5,
-    on_shelf:true
+    on_shelf:true,
+    section_name:"Computer Science"
   }
 ];
 
   // renders the page with the ejs templating using the tempBooks data above
   res.render("pages/books.ejs", {data:tempBook});
-});  /*books.html*/
+});
 
 
 
 /*
       FUNCTIONS TO HANDLE THE ADDITION AND SEARCH OF A PATRON.
 */
-app.get("/patrons.html", (req, res) => {
-
+app.get("/patrons.html", (req, res)=>{
+  // serving up the patrons page
     var tempPatrons = [
         {
             patron_id: 1,
@@ -185,9 +188,8 @@ app.get("/patrons.html", (req, res) => {
       FUNCTIONS TO HANDLE THE SEARCH OF PUBLISHERS AND SEARCH OF BOOK BY PUBLISHERS
 */
 
-app.get("/publishers.html", (req, res) => {
-
-    var tempPublishers = [
+app.get("/publishers.html", (req, res)=>{
+  var tempPublishers = [
         {
             publisher_id: 1,
             company_name: "Penguin"
@@ -202,7 +204,7 @@ app.get("/publishers.html", (req, res) => {
         }
     ]
 
-  // serving up the publishers page
+    // serving up the publishers page
     res.render("pages/publishers.ejs", { data: tempPublishers } );
 });
 
@@ -212,6 +214,7 @@ app.get("/publishers.html", (req, res) => {
       FUNCTION TO HANDLE THE SEARCH OF SECTIONS AND SEARCH OF BOOKS BY SECTIONS
 */
 
+
 app.get("/sections.html", (req, res)=>{
   // for now this displays all the sections with fake data.
 
@@ -220,31 +223,31 @@ app.get("/sections.html", (req, res)=>{
 
   // this is where the query would go for showing all sections though
   var tempSections =[
-    {
-      section_id:1,
-      section_name:"Science",
-      number_of_books:10
-    },
-    {
-      section_id:2,
-      section_name:"Art",
-      number_of_books:2
-    },
-    {
-      section_id:3,
-      section_name:"Computer Science",
-      number_of_books:150
-    },
-    {
-      section_id:4,
-      section_name:"Fiction",
-      number_of_books:150
-    },
-    {
-      section_id:5,
-      section_name:"Non-Fiction",
-      number_of_books:150
-    }
+      {
+        section_id:1,
+        section_name:"Science",
+        number_of_books:10
+      },
+      {
+        section_id:2,
+        section_name:"Art",
+        number_of_books:2
+      },
+      {
+        section_id:3,
+        section_name:"Computer Science",
+        number_of_books:150
+      },
+      {
+        section_id:4,
+        section_name:"Fiction",
+        number_of_books:150
+      },
+      {
+        section_id:5,
+        section_name:"Non-Fiction",
+        number_of_books:150
+      }
   ];
 
   // renders the sections page with the data above.
@@ -257,8 +260,8 @@ app.get("/sections.html", (req, res)=>{
       FUNCTIONS TO HANDLE THE SEARCH OF AUTHORS AND SEARCH OF BOOK BY AUTHORS
 */
 
-app.get("/authors.html", (req, res) => {
-
+app.get("/authors.html", (req, res)=>{
+  
     var tempAuthors = [
         {
             author_id: 1,
@@ -275,11 +278,55 @@ app.get("/authors.html", (req, res) => {
             first_name: "John",
             last_name: "Steinbeck"
         }
-    ]
+    ];
 
     res.render("pages/authors.ejs", { data: tempAuthors } );
 });
 
+
+
+/*
+
+    FUNCTIONS TO HANDLE THE SIGN UP FOR A NEW PATORN
+*/
+
+app.get("/signup.html", (req,res)=>{
+  var data={
+    error:""
+  };
+
+  res.render("pages/signup.ejs", {data:data});
+});
+
+
+
+app.post("/signup", (req, res)=>{
+  console.log(req.body);
+
+  if(!req.body.firstName || !req.body.lastName || !req.body.phone || !req.body.address || req.body.firstName=="" || req.body.lastName=="" || req.body.phone=="" || req.body.address==""){
+    // user did not enter all the data needed
+    var data={
+      error:"Please enter all the fields."
+    };
+    res.render("pages/signup.ejs", {data:data});
+  }else{
+    // all the information exists, clean it
+    if(req.body){
+      var data={
+        first_name:removeSpecialCharacters(req.body.firstName),
+        last_name:removeSpecialCharacters(req.body.lastName),
+        phone:removeSpecialCharacters(req.body.phone),
+        address:removeSpecialCharacters(req.body.address)
+      };
+      console.log(data);
+
+      // handle sending the data to the DB HERE
+
+      res.render("pages/success.ejs", {signup:data, data:""});
+    }
+  }
+
+});
 
 
 /*
@@ -291,7 +338,7 @@ function removeSpecialCharacters(toRemove){
 
   // this is so that a user input cant drop our tables
 
-  var specialCharacters = "[]+_-=!@#$%^&*();:|\.,<>?`~";
+  var specialCharacters = "[]+_-=!#$@%^&*();:|\.,<>?`~";
 
   for(var i=0; i<specialCharacters.length; i++){
     toRemove = toRemove.replaceAll(specialCharacters[i], "");
