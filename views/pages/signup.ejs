@@ -1,0 +1,39 @@
+<%- include ("../partials/header") %>
+
+  <div class="myContainer element-col center">
+
+
+    <!-- form for the addition of a new user into the patrons table -->
+    <div class="single-item">
+      <h2>New user form:</h2>
+      <form action="/signup" method="post">
+        <!-- information for the user to input -->
+        <div class="form-group">
+            <label for="firstName">First name:</label>
+            <input type="text" class="form-control" id="firstName" name="firstName">
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last name:</label>
+            <input type="text" class="form-control" id="lastName" name="lastName">
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone:</label>
+            <input type="tel" class="form-control" id="phone" name="phone">
+          </div>
+          <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="" class="form-control" id="address" name="address">
+          </div>
+          <br/>
+          <button type="submit" class="btn btn-dark">Submit!</button>
+
+      </form>
+      <% if(data.error || data.error != ""){%>
+        <%= data.error %>
+
+      <%}%>
+    </div>
+
+  </div>
+
+<%- include ("../partials/footer") %>

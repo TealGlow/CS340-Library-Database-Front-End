@@ -96,7 +96,7 @@ app.post("/validateFormCheckOut", (req,res)=>{
     // if we cannot find that patron we should redirect them to a page to sign
     // up instead, but that can be done later.
     console.log("sending to success");
-    res.render("pages/success.ejs", {data:data});
+    res.render("pages/success.ejs", {data:data, signup:""});
   }
 });
 
@@ -118,7 +118,8 @@ app.get("/books.html", (req, res)=>{
     pages:300,
     publication:new Date(),
     publisher_id:1,
-    on_shelf:true
+    on_shelf:true,
+    section_name:"Art"
   },
   {
     book_id:2,
@@ -127,7 +128,8 @@ app.get("/books.html", (req, res)=>{
     pages:301,
     publication:new Date(),
     publisher_id:1,
-    on_shelf:false
+    on_shelf:false,
+    section_name:"Mathematics"
   },
   {
     book_id:3,
@@ -136,7 +138,8 @@ app.get("/books.html", (req, res)=>{
     pages:301,
     publication:new Date(),
     publisher_id:5,
-    on_shelf:true
+    on_shelf:true,
+    section_name:"Computer Science"
   }
 ];
 
@@ -223,6 +226,50 @@ app.get("/authors.html", (req, res)=>{
 
 
 /*
+
+    FUNCTIONS TO HANDLE THE SIGN UP FOR A NEW PATORN
+*/
+
+app.get("/signup.html", (req,res)=>{
+  var data={
+    error:""
+  };
+
+  res.render("pages/signup.ejs", {data:data});
+});
+
+
+
+app.post("/signup", (req, res)=>{
+  console.log(req.body);
+
+  if(!req.body.firstName || !req.body.lastName || !req.body.phone || !req.body.address || req.body.firstName=="" || req.body.lastName=="" || req.body.phone=="" || req.body.address==""){
+    // user did not enter all the data needed
+    var data={
+      error:"Please enter all the fields."
+    };
+    res.render("pages/signup.ejs", {data:data});
+  }else{
+    // all the information exists, clean it
+    if(req.body){
+      var data={
+        first_name:removeSpecialCharacters(req.body.firstName),
+        last_name:removeSpecialCharacters(req.body.lastName),
+        phone:removeSpecialCharacters(req.body.phone),
+        address:removeSpecialCharacters(req.body.address)
+      };
+      console.log(data);
+
+      // handle sending the data to the DB HERE
+
+      res.render("pages/success.ejs", {signup:data, data:""});
+    }
+  }
+
+});
+
+
+/*
     FUNCTION FOR FORM VALIDATION, REMOVAL OF SPECIAL CHARACTERS FROM THE STRING.
 */
 function removeSpecialCharacters(toRemove){
@@ -231,7 +278,7 @@ function removeSpecialCharacters(toRemove){
 
   // this is so that a user input cant drop our tables
 
-  var specialCharacters = "[]+_-=!@#$%^&*();:|\.,<>?`~";
+  var specialCharacters = "[]+_-=!#$@%^&*();:|\.,<>?`~";
 
   for(var i=0; i<specialCharacters.length; i++){
     toRemove = toRemove.replaceAll(specialCharacters[i], "");
