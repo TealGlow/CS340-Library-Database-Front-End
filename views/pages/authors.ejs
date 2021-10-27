@@ -13,12 +13,19 @@
   <div class="main-container">
 
     <% if(data !=""){%>
+      <%if(searchTitle!=""){%>
+        <!-- if user got here by search, then we will display that information right here-->
+        <h1>Search by: <%=searchTitle%></h1>
+      <%}%>
 
       <% for(var i=0; i < data.length; i++){%>
 
         <div class="single-item" id=<% "Author " + data[i].author_id %> >
             <h1><strong><%= data[i].first_name + " " + data[i].last_name %></strong></h1>
-            <form>
+            <strong>Books in library: </strong><%=data[i].quantity%>
+            <form method="POST" action ="/search">
+                <input class="hidden" name="search_by" id="search" value ="authors">
+                <input class="hidden" name="userInput" id="userInput" value ="<%= data[i].first_name %> <%= data[i].last_name %>">
                 <button type="Submit" class="btn btn-dark"> See books by <%= data[i].first_name %> <%= data[i].last_name %> </button>
             </form>
         </div>

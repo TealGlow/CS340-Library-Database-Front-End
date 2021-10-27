@@ -8,19 +8,27 @@
         -->
 
         <!-- still working on this form-->
-        <form class="single-item" method="POST">
-          <h1>Search our catalog</h1>
-          <label for="cars">Search by: </label>
-          <select name="search_by" id="search">
-            <option value="Keyword">Keyword</option>
-            <option value="Title">Title</option>
-            <option value="Author">Author</option>
-            <option value="Publisher">Publisher</option>
-            <option value="Genre">Genre</option>
-          </select>
-          <input type="text" name="title">
-          <button type="submit" class="btn btn-dark">Search!</button>
-        </form>
+        <div class="single-item">
+          <form action="/search" method="POST">
+            <h1>Search our catalog</h1>
+
+            <label for="search_by">Search by: </label>
+            <select class="dropdown-toggle" name="search_by" id="search">
+              <option value="books">Title</option>
+              <!--<option value="Keyword">Keyword</option>-->
+              <option value="authors">Author</option>
+              <option value="publishers">Publisher</option>
+              <option value="sections">Section</option>
+            </select>
+            <input type="text" class="form-control" name="userInput">
+            <br/>
+            <button type="submit" class="btn btn-dark">Search!</button>
+          </form>
+          <%if(data.error){%>
+            <div class="not-avail"><%=data.error%></div>
+          <%}%>
+        </div>
+        <br/>
 
         <br/>
         <br/>

@@ -11,6 +11,10 @@
 <div class="myContainer element-col center">
   <div class="main-container">
     <% if(data !=""){%>
+      <%if(searchTitle!=""){%>
+        <!-- if user got here by search, then we will display that information right here-->
+        <h1>Search by: <%=searchTitle%></h1>
+      <%}%>
       <% for(var i=0; i < data.length; i++){%>
         <div class="single-item" id=<%"book"+data[i].book_id%> >
           <h1><strong><%= data[i].title %></strong></h1>
@@ -18,8 +22,33 @@
           <strong>ISBN:</strong> <%= data[i].isbn %> <br/>
           <strong>Pages:</strong> <%= data[i].pages %> <br/>
           <strong>Publication date:</strong> <%= data[i].publication %> <br/>
+          <strong>Publisher name:</strong> <%= data[i].publisher_name %> <br/>
           <strong>Publisher id:</strong> <%= data[i].publisher_id %> <br/>
           <strong>Section:</strong> <%= data[i].section_name %> <br/>
+
+          <!--
+            formatting for the author list section
+            this is so that if there is multiple authors it will list them all
+            I also made it so that if there are multiple authors Author: changes to Authors:
+            its a small change, but it felt nicer
+          -->
+          <% if(data[i].authors.length > 1){%>
+            <!-- multiple authors-->
+            <strong>Authors:</strong>
+            <% for(var j=0; j<(data[i].authors).length; j++){%>
+              <%= data[i].authors[j].f_name %> <%= data[i].authors[j].l_name %>
+              <% if(j !=(data[i].authors.length) -1){%>
+                  ,
+              <%}%>
+            <%}%>
+          <%}else{%>
+            <!-- one author-->
+            <strong>Author:</strong>
+            <%= data[i].authors[0].f_name %> <%= data[i].authors[0].l_name %>
+          <%}%>
+          <!-- end of formatting for the author list section-->
+
+
           <% if(data[i].on_shelf == true){ %>
             <!-- status available -->
             <div class="avail"><strong>On Shelf!</strong></div>
