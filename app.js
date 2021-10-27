@@ -34,7 +34,10 @@ app.get("/index.html", (req, res)=>{
   // main page for now just shows the different pages we can go to.
   // I did this since I was using node.js and ejs for templating
   // I know in the rubric they wanted the main page to be index.html
-  res.render("pages/index.ejs");
+  var data={
+    error:""
+  }
+  res.render("pages/index.ejs", {data:data});
 });
 
 
@@ -119,7 +122,9 @@ app.get("/books.html", (req, res)=>{
     publication:new Date(),
     publisher_id:1,
     on_shelf:true,
-    section_name:"Art"
+    section_name:"Art",
+    authors:[{f_name:"temp1",l_name:"temp2"}],
+    publisher_name:"Publisher name!"
   },
   {
     book_id:2,
@@ -129,7 +134,9 @@ app.get("/books.html", (req, res)=>{
     publication:new Date(),
     publisher_id:1,
     on_shelf:false,
-    section_name:"Mathematics"
+    section_name:"Mathematics",
+    authors:[{f_name:"temp1",l_name:"temp2"}, {f_name:"temp3",l_name:"temp4"}, {f_name:"temp5",l_name:"temp5"}],
+    publisher_name:"Hello"
   },
   {
     book_id:3,
@@ -139,12 +146,14 @@ app.get("/books.html", (req, res)=>{
     publication:new Date(),
     publisher_id:5,
     on_shelf:true,
-    section_name:"Computer Science"
+    section_name:"Computer Science",
+    authors:[{f_name:"temp1",l_name:"temp2"}],
+    publisher_name:"Another publisher"
   }
 ];
 
   // renders the page with the ejs templating using the tempBooks data above
-  res.render("pages/books.ejs", {data:tempBook});
+  res.render("pages/books.ejs", {data:tempBook, searchTitle:""});
 });
 
 
@@ -261,26 +270,29 @@ app.get("/sections.html", (req, res)=>{
 */
 
 app.get("/authors.html", (req, res)=>{
-  
+
     var tempAuthors = [
         {
             author_id: 1,
             first_name: "Mark",
-            last_name: "Twain"
+            last_name: "Twain",
+            quantity:10
         },
         {
             author_id: 2,
             first_name: "Charles",
-            last_name: "Dickens"
+            last_name: "Dickens",
+            quantity:10
         },
         {
             author_id: 3,
             first_name: "John",
-            last_name: "Steinbeck"
+            last_name: "Steinbeck",
+            quantity:10
         }
     ];
 
-    res.render("pages/authors.ejs", { data: tempAuthors } );
+    res.render("pages/authors.ejs", { data: tempAuthors, searchTitle:"" } );
 });
 
 
@@ -330,8 +342,131 @@ app.post("/signup", (req, res)=>{
 
 
 /*
+
+  FUNCTIONS FOR THE MAIN SEARCH BAR
+
+*/
+app.post("/search", (req,res)=>{
+  console.log(req.body)
+  if(!req.body){
+    // somehow the body has nothing
+    var data={
+      error:"Please enter something!"
+    }
+    res.render("pages/index.ejs", {data:data})
+  }else if (req.body.userInput == "") {
+    // user tries to input nothing
+    var data={
+      error:"Please enter something!"
+    }
+    res.render("pages/index.ejs", {data:data})
+  }else{
+    // user input something, clean their input and search based on that
+    var searchBy = req.body.search_by;
+    var userInput = removeSpecialCharacters(req.body.userInput);
+    var data={
+      searchBy:userInput
+    }
+
+    /*
+      THIS IS WHERE WE WOULD QUERY THE SEARCH BASED ON USER INPUT
+
+    */
+
+    var fake_book_data=[
+      {
+        book_id:1,
+        isbn:0000000,
+        title:userInput,
+        pages:300,
+        publication:new Date(),
+        publisher_id:1,
+        on_shelf:true,
+        section_name:"Art",
+        authors:[{f_name:"temp1",l_name:"temp2"}],
+        publisher_name:"pub name"
+      }
+    ];
+
+
+    var fake_author_data=[
+      {
+        book_id:1,
+        isbn:0000000,
+        title:"temp book title :)",
+        pages:300,
+        publication:new Date(),
+        publisher_id:1,
+        on_shelf:true,
+        section_name:"Art",
+        authors:[{f_name:userInput,l_name:"temp2"}],
+        publisher_name:"pub name"
+      }
+    ];
+
+
+    var fake_pub_data=[
+      {
+        book_id:1,
+        isbn:0000000,
+        title:"temp book title :)",
+        pages:300,
+        publication:new Date(),
+        publisher_id:1,
+        on_shelf:true,
+        section_name:"Art",
+        authors:[{f_name:"temp2",l_name:"temp2"}],
+        publisher_name:userInput
+      }
+    ];
+
+
+    var fake_section_data=[
+      {
+        book_id:1,
+        isbn:0000000,
+        title:"temp book title :)",
+        pages:300,
+        publication:new Date(),
+        publisher_id:1,
+        on_shelf:true,
+        section_name:userInput,
+        authors:[{f_name:"temp2",l_name:"temp2"}],
+        publisher_name:"Pub :)"
+      }
+    ];
+
+    var fake_data_dict={
+      books:fake_book_data,
+      authors:fake_author_data,
+      publishers:fake_pub_data,
+      sections:fake_section_data
+    };
+
+    var f_data=fake_data_dict[searchBy];
+
+    /*
+      END OF FAKE DATA
+    */
+
+    // render of the page books
+
+    res.render("pages/books.ejs", {data:f_data, searchTitle: userInput});
+  }
+});
+
+
+
+app.get("/search", (req,res)=>{
+  // get request to /search will just send them back to main right now, can be changed if needed
+  res.redirect("/index.html");
+});
+
+/*
     FUNCTION FOR FORM VALIDATION, REMOVAL OF SPECIAL CHARACTERS FROM THE STRING.
 */
+
+
 function removeSpecialCharacters(toRemove){
   // function that takes a string and removes all the special characters in
   // the array below.

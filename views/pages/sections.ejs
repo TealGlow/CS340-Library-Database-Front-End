@@ -17,7 +17,9 @@
           <strong>Section id: </strong><%=data[i].section_id%><br/>
 
           <Strong>Number of Books: </strong><%=data[i].number_of_books%>
-          <form>
+          <form method="POST" action="/search">
+            <input class="hidden" name="search_by" id="search" value ="sections">
+            <input class="hidden" name="userInput" id="userInput" value ="<%= data[i].section_name %>">
             <button type="Submit" class="btn btn-dark">See books in this section</button>
           </form>
         </div>

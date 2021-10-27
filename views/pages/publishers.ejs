@@ -16,7 +16,9 @@
 
         <div class="single-item" id=<% data[i].publisher_id %> >
             <h1><strong><%= data[i].company_name %></strong></h1>
-            <form>
+            <form method="POST" action="/search">
+                <input class="hidden" name="search_by" id="search" value ="publishers">
+                <input class="hidden" name="userInput" id="userInput" value ="<%= data[i].company_name %>">
                 <button type="Submit" class="btn btn-dark"> See books published by <%= data[i].company_name %> </button>
             </form>
         </div>
