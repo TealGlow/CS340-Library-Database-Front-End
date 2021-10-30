@@ -1,0 +1,72 @@
+<%- include ("../partials/header") %>
+
+  <div class="myContainer center element-col">
+    <%if(error!=""){%>
+      <div class="not-avail"><%=error%></div>
+    <%}%>
+    <!-- form to add data -->
+    <form method="POST" action="/booksTable.html">
+      <label for="book_id">Book_id:</label>
+      <input name="book_id" class="form-control">
+
+      <label>isbn:</label>
+      <input name="isbn" class="form-control">
+
+      <label>title:</label>
+      <input name="title" class="form-control">
+
+      <label>pages:</label>
+      <input name="pages" class="form-control">
+
+      <label>publication:</label>
+      <input name="publication" class="form-control">
+
+      <label>publisher_id:</label>
+      <input name="publisher_id" class="form-control">
+
+      <label>section_id:</label>
+      <input name="section_id" class="form-control">
+
+      <label >on_shelf:</label>
+      <input name="on_shelf" class="form-control">
+      <button class="btn btn-dark" type="Submit">Add</button>
+    </form>
+
+    <!-- form to show data in table-->
+    <table>
+      <tr>
+        <th><u>book_id</u></th>
+        <th>isbn</th>
+        <th>title</th>
+        <th>pages</th>
+        <th>publication</th>
+        <th>publisher_id</th>
+        <th>section_id</th>
+        <th>on_shelf</th>
+        <th>Modify</th>
+        <th>Delete</th>
+      </tr>
+      <% for(var i = 0; i<data.length; i++){%>
+
+        <tr>
+          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormBooks(<%=i%>)">
+            <td><input name="book_id" placeholder="<%=data[i].book_id%>" value="<%=data[i].book_id%>"></td>
+            <td><input name="isbn" placeholder="<%=data[i].isbn%>" value ="<%=data[i].isbn%>"> </td>
+            <td><input name="title" placeholder="<%=data[i].title%>" value ="<%=data[i].title%>"> </td>
+            <td><input name="pages" placeholder="<%=data[i].pages%>" value ="<%=data[i].pages%>"> </td>
+            <td><input name="publication" placeholder="<%=data[i].publication%>" value ="<%=data[i].publication%>"> </td>
+            <td><input name="publisher_id" placeholder="<%=data[i].publisher_id%>" value ="<%=data[i].publisher_id%>"></td>
+            <td><input name="section_id" placeholder="<%=data[i].section_id%>" value ="<%=data[i].section_id%>"></td>
+            <td><input name="on_shelf" placeholder="<%=data[i].on_shelf%>" value ="<%=data[i].on_shelf%>"></td>
+            <td><button class="btn btn-dark" name="modify" value="<%=i%>" type = "submit" class="btn btn-dark">Modify</button></td>
+          </form>
+          <td><button class="btn btn-dark">Delete</button></td>
+        </tr>
+
+      <%}%>
+
+    </table>
+
+  </div>
+
+<%- include ("../partials/footer") %>
