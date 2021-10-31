@@ -1,0 +1,43 @@
+<%- include ("../partials/header") %>
+<div class="myContainer center element-col">
+  <%if(error!=""){%>
+    <div class="not-avail"><%=error%></div>
+  <%}%>
+  <!-- form to add data -->
+  <form class="addData" onSubmit="addAndValidateFormSections()">
+    <label for="section_id">Section_id:</label>
+    <input type="number" name="section_id" class="form-control">
+
+    <label>Section_name:</label>
+    <input type="text" name="section_name" class="form-control">
+
+    <br/>
+    <button class="btn btn-dark" type="Submit">Add</button>
+    <div class="not-avail" id="data-add-error"></div>
+  </form>
+
+  <!-- form to show data in table-->
+  <table>
+    <tr>
+      <th><u>Section id</u></th>
+      <th>Section Name</th>
+    </tr>
+    <% for(var i = 0; i<data.length; i++){%>
+
+      <tr>
+        <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormSections(<%= data[i].section_id %>)">
+          <td><input type="number" name="section_id" placeholder="<%=data[i].section_id%>" value="<%=data[i].section_id%>"></td>
+          <td><input type="text" name="section_name" placeholder="<%=data[i].section_name%>" value ="<%=data[i].section_name%>"> </td>
+          <td><button class="btn btn-dark" name="modify" value="<%=i%>" type = "submit" class="btn btn-dark">Modify</button></td>
+        </form>
+        <td><form onsubmit="sectionsTableRemoval(<%= data[i].section_id %>)"><button value ="<%= data[i].section_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+      </tr>
+
+    <%}%>
+
+  </table>
+
+</div>
+
+
+<%- include ("../partials/footer") %>

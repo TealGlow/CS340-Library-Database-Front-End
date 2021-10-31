@@ -25,7 +25,7 @@ var tempBookShow = [
       isbn:0000000,
       title:"Book title 1",
       pages:300,
-      publication:new Date(),
+      publication:'1999-01-02',
       publisher_id:0, //FK
       section_id:0,  //FK
       on_shelf:true,
@@ -35,7 +35,7 @@ var tempBookShow = [
       isbn:1111111,
       title:"Book title 2",
       pages:300,
-      publication:new Date(),
+      publication:'1999-01-03',
       publisher_id:1, //FK
       section_id:1,  //FK
       on_shelf:false,
@@ -45,11 +45,23 @@ var tempBookShow = [
       isbn:222222,
       title:"Book title 3",
       pages:300,
-      publication:new Date(),
+      publication:'1999-01-05',
       publisher_id:2, //FK
       section_id:2,  //FK
       on_shelf:true,
     },
+];
+
+
+var tempSectionData=[
+  {
+    section_id:0,
+    section_name:"Computer Science"
+  },
+  {
+    section_id:1,
+    section_name:"Art"
+  }
 ];
 
 
@@ -209,46 +221,53 @@ app.get("/booksTable.html", (req, res)=>{
 /*
 add
 */
-app.post("/booksTable.html", (req, res)=>{
+app.post("/booksTable", (req, res)=>{
   // add item to the booksTable
-  console.log("booksTable POST");
+  console.log("booksTable POST", req.body);
 
   // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
-  var bid = removeSpecialCharacters(req.body.book_id);
-  var isb = removeSpecialCharacters(req.body.isbn);
-  var ti = removeSpecialCharacters(req.body.title);
-  var pa = removeSpecialCharacters(req.body.pages);
-  var pub = removeSpecialCharacters(req.body.publication);
-  var pid = removeSpecialCharacters(req.body.publisher_id);
-  var sid = removeSpecialCharacters(req.body.section_id);
-  var ons = removeSpecialCharacters(req.body.on_shelf);
 
-  // validation of the POST request data.
-  if(!req.body || !bid || !isb || !ti || !pa || !pub || !pid || !sid  || !ons){
-    // user did not enter an item, give them an error and do not add the DATA
-    res.render("pages/booksTable.ejs", {data:tempBookShow, error:"Please enter all data fields."})
+  if(!req.body){
+    console.error("No req body");
   }else{
-    // adding the validated data to an object
+    var bid = removeSpecialCharacters(req.body.book_id);
+    var isb = removeSpecialCharacters(req.body.isbn);
+    var ti = removeSpecialCharacters(req.body.title);
+    var pa = removeSpecialCharacters(req.body.pages);
+    var pub = req.body.publication;
+    var pid = removeSpecialCharacters(req.body.publisher_id);
+    var sid = removeSpecialCharacters(req.body.section_id);
+    var ons = removeSpecialCharacters(req.body.on_shelf);
 
-    // BEFORE ADDING WE ALSO NEED TO MAKE SURE THIS ISNT ALREADY IN THE TABLE
-    // OR IF DATA IS REPEATED
+    // validation of the POST request data.
 
-    var temp = {
-      book_id: bid,
-      isbn: isb,
-      title: ti,
-      pages: pa,
-      publication: pub,
-      publisher_id: pid,
-      section_id: sid,
-      on_shelf: ons
-    };
+    if(!req.body || !bid || !isb || !ti || !pa || !pub || !pid || !sid  || !ons){
+      // user did not enter an item, give them an error and do not add the DATA
+      res.render("pages/booksTable.ejs", {data:tempBookShow, error:"Please enter all data fields."})
+    }else{
+      // adding the validated data to an object
 
-    // adding that object to the DB (in this case its a temp arra)
-    tempBookShow.push(temp);
+      // BEFORE ADDING WE ALSO NEED TO MAKE SURE THIS ISNT ALREADY IN THE TABLE
+      // OR IF DATA IS REPEATED
 
-    res.render("pages/booksTable.ejs", {data:tempBookShow, error:""});
+      var temp = {
+        book_id: bid,
+        isbn: isb,
+        title: ti,
+        pages: pa,
+        publication: pub,
+        publisher_id: pid,
+        section_id: sid,
+        on_shelf: ons
+      };
+
+      // adding that object to the DB (in this case its a temp arra)
+      tempBookShow.push(temp);
+
+      res.render("pages/booksTable.ejs", {data:tempBookShow, error:""});
+    }
   }
+
 
 });
 
@@ -257,9 +276,21 @@ app.post("/booksTable.html", (req, res)=>{
 /*
 update
 */
-app.put("/booksTable.html", (req,res)=>{
+
+app.put("/booksTable", (req,res)=>{
   // updates the item if there was a change
-  console.log(req.params.book_id, req.body.book_id, req.query.book_id);
+  console.log(req.body);
+
+  // TODO: if only 1 thing was modified we dont wanna modify the entire table
+  // again right?
+  tempBookShow["book_id"] = req.body.book_id;
+  tempBookShow["isbn"] = req.body.isbn;
+  tempBookShow["title"] = req.body.title;
+  tempBookShow["pages"] = req.body.pages;
+  tempBookShow["publication"] = req.body.publication;
+  tempBookShow["publisher_id"] = req.body.publisher_id;
+  tempBookShow["section_id"] = req.body.section_id;
+  tempBookShow["on_shelf"] = req.body.on_shelf;
   res.send("got a PUT request");
 });
 
@@ -269,6 +300,9 @@ app.put("/booksTable.html", (req,res)=>{
 delete
 */
 
+app.delete("/booksTable.html", (req, res)=>{
+  console.log("delete");
+});
 
 
 /*
@@ -376,6 +410,34 @@ app.get("/sections.html", (req, res)=>{
   res.render("pages/sections.ejs", {data: tempSections});
 });
 
+
+/*
+   FUNCTIONS TO HANDLE THE SECTIONS TABLE, ALLOW FOR THE ADDITION, REMOVAL, AND
+   MODIFICATION OF THE SECTIONS TABLE.
+*/
+app.get("/sectionsTable.html", (req,res)=>{
+  res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
+});
+
+
+app.post("/sectionsTable", (req, res)=>{
+  console.log(req.body);
+  var temp={
+    section_id:req.body.section_id,
+    section_name:req.body.section_name
+  };
+  console.log(tempSectionData)
+  tempSectionData.push(temp);
+  res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
+});
+
+app.put("/sectionsTable", (req, res)=>{
+  // TODO: if only 1 thing was modified we dont wanna modify the entire table
+  // again right?
+  tempSectionData["section_id"] = req.body.section_id;
+  tempSectionData["section_name"] = req.body.section_name;
+  res.send("got a PUT request");
+});
 
 
 /*
