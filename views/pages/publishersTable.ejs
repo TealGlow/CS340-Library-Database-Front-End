@@ -1,0 +1,47 @@
+<%- include ("../partials/header") %>
+
+  <div class="myContainer center element-col">
+    <%if(error!=""){%>
+      <div class="not-avail"><%=error%></div>
+    <%}%>
+    <!-- form to add data -->
+    <form class="addData" onSubmit="addAndValidateFormPublishers()">
+      <label for="publisher_id">publisher_id:</label>
+      <input type="number" name="publisher_id" class="form-control">
+
+      <label for="company_name">company_name:</label>
+      <input type="text" name="company_name" class="form-control">
+
+      <br/>
+      <button class="btn btn-dark" type="Submit">Add</button>
+      <div class="not-avail" id="data-add-error"></div>
+    </form>
+
+    <!-- form to show data in table-->
+    <table>
+      <tr>
+        <th><u>publisher_id</u></th>
+        <th>company_name</th>
+
+        <th>Modify</th>
+        <th>Delete</th>
+      </tr>
+      <% for(var i = 0; i<data.length; i++){%>
+
+        <tr>
+          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormPublishers(<%=data[i].publisher_id%>)">
+            <td><input type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" value="<%=data[i].publisher_id%>"></td>
+            <td><input type="text" name="company_name" placeholder="<%=data[i].company_name%>" value ="<%=data[i].company_name%>"> </td>
+
+            <td><button class="btn btn-dark" name="modify" value="<%=data[i].publisher_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
+          </form>
+          <td><form onsubmit="publishersTableRemoval(<%= data[i].publisher_id %>)"><button value ="<%= data[i].publisher_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+        </tr>
+
+      <%}%>
+
+    </table>
+
+  </div>
+
+<%- include ("../partials/footer") %>

@@ -50,9 +50,6 @@ const addAndValidateFormBooks = async ()=>{
 
 
 
-
-
-
 const validateFormBooks = async (i)=>{
   // FOR MODIFICATION OF DATA IN THE TABLE
   event.preventDefault();
@@ -89,9 +86,14 @@ const booksTableRemoval = async (i)=>{
 };
 
 
+
 /*
+
   FUNCTIONS FOR THE SECTIONS TABLE
+
 */
+
+
 const addAndValidateFormSections = async ()=>{
   event.preventDefault();
   let temp = document.getElementsByClassName("addData");
@@ -116,6 +118,7 @@ const addAndValidateFormSections = async ()=>{
 };
 
 
+
 const validateFormSections = async (i)=>{
   event.preventDefault();
   let temp = document.getElementsByClassName("row-data");
@@ -135,7 +138,238 @@ const validateFormSections = async (i)=>{
 };
 
 
+
 const sectionsTableRemoval = async (i)=>{
+  event.preventDefault();
+  console.log("Delete", i);
+};
+
+
+
+/*
+
+  FUNCTIONS FOR THE PATRONS TABLE
+
+*/
+
+
+const addAndValidateFormPatrons = async ()=>{
+  // FOR ADDING SOMETING INTO THE TABLE
+  event.preventDefault();
+  // nothing in books can be null
+
+  // TO DO: DONT LET USER ENTER INCORRECT DATA
+
+  let temp = document.getElementsByClassName("addData");
+  var data={
+    patron_id:"",
+    first_name:"",
+    last_name:"",
+    address:"",
+    phone:""
+  };
+
+  console.log(temp);
+
+  // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
+
+  for(var i=0; i<temp[0].length-1; i++){
+    data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
+  }
+  data["phone"] = $(temp)[0][4].value;
+
+  if(data["patron_id"] == "" || data["first_name"] =="" || data["last_name"] == "" || data["address"] == "" || data["phone"] == ""){
+    console.log("Error please enter all data fields!");
+    document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+  }else{
+    // else we did it and we can send the data to the db!
+    // send a request to the db
+    reqServer("POST", "/patronsTable", data);
+  }
+
+
+};
+
+
+
+const validateFormPatrons = async (i)=>{
+  event.preventDefault();
+
+  let temp = document.getElementsByClassName("row-data");
+  let toSubmit = temp[i];
+
+
+  var data={
+    "patron_id":"",
+    "first_name":"",
+    "last_name":"",
+    "address":"",
+    "phone":"",
+    "prev_id":i
+  };
+
+
+  for(var j=0; j<toSubmit.length; j++){
+    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+  }
+
+  data["address"] = $(toSubmit)[0][3];
+  data["phone"] = $(toSubmit)[0][4];
+  // after data clean
+  reqServer("PUT", "/patronsTable", data);
+};
+
+
+
+const patronsTableRemoval = async(i)=>{
+  event.preventDefault();
+  console.log("Delete", i);
+};
+
+
+
+/*
+
+  FUNCTIONS FOR THE PUBLISHERS TABLE.
+
+*/
+
+
+const addAndValidateFormPublishers = async ()=>{
+  // FOR ADDING SOMETING INTO THE TABLE
+  event.preventDefault();
+  // nothing in books can be null
+
+  // TO DO: DONT LET USER ENTER INCORRECT DATA
+
+  let temp = document.getElementsByClassName("addData");
+  var data={
+    publisher_id:"",
+    company_name:"",
+  };
+
+  console.log(temp);
+
+  // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
+
+  for(var i=0; i<temp[0].length-1; i++){
+    data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
+  }
+
+  if(data["publisher_id"] == "" || data["company_name"] =="" ){
+    console.log("Error please enter all data fields!");
+    document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+  }else{
+    // else we did it and we can send the data to the db!
+    // send a request to the db
+    reqServer("POST", "/publishersTable", data);
+  }
+
+
+};
+
+
+
+const validateFormPublishers = async (i)=>{
+  event.preventDefault();
+
+  let temp = document.getElementsByClassName("row-data");
+  let toSubmit = temp[i];
+
+
+  var data={
+    "publisher_id":"",
+    "company_name":"",
+    "prev_id":i
+  };
+
+
+  for(var j=0; j<toSubmit.length; j++){
+    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+  }
+
+  // after data clean
+  reqServer("PUT", "/publishersTable", data);
+};
+
+
+
+const publishersTableRemoval = async (i)=>{
+  event.preventDefault();
+  console.log("Delete", i);
+};
+
+
+
+/*
+
+  FUNCTION FOR THE AUTHORS TABLE
+
+*/
+
+
+const addAndValidateFormAuthors = async ()=>{
+  // FOR ADDING SOMETING INTO THE TABLE
+  event.preventDefault();
+  // nothing in books can be null
+
+  // TO DO: DONT LET USER ENTER INCORRECT DATA
+
+  let temp = document.getElementsByClassName("addData");
+  var data={
+    author_id:"",
+    first_name:"",
+    last_name:""
+  };
+
+  console.log(temp);
+
+  // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
+
+  for(var i=0; i<temp[0].length-1; i++){
+    data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
+  }
+
+  if(data["author_id"] == "" || data["first_name"] ==""|| data["last_name"] =="" ){
+    console.log("Error please enter all data fields!");
+    document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+  }else{
+    // else we did it and we can send the data to the db!
+    // send a request to the db
+    reqServer("POST", "/authorsTable", data);
+  }
+
+
+};
+
+
+
+const validateFormAuthors = async (i)=>{
+  event.preventDefault();
+
+  let temp = document.getElementsByClassName("row-data");
+  let toSubmit = temp[i];
+
+
+  var data={
+    author_id:"",
+    first_name:"",
+    last_name:"",
+    prev_id:i
+  };
+
+
+  for(var j=0; j<toSubmit.length; j++){
+    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+  }
+
+  // after data clean
+  reqServer("PUT", "/authorsTable", data);
+};
+
+
+
+const authorsTableRemoval = async (i)=>{
   event.preventDefault();
   console.log("Delete", i);
 };
@@ -145,6 +379,7 @@ const sectionsTableRemoval = async (i)=>{
 /*
    FUNCTION TO REQUEST THE SERVER WITH REQUEST TYPE, DATA AND LOCATION
 */
+
 
 const reqServer = (reqType, loc, data)=>{
   /*

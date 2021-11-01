@@ -65,6 +65,55 @@ var tempSectionData=[
 ];
 
 
+var tempPatronsData=[
+  {
+    patron_id:0,
+    first_name:"Jesse",
+    last_name:"Team Rocket",
+    address:"Street name here",
+    phone:"555-555-5555"
+  },
+  {
+    patron_id:1,
+    first_name:"James",
+    last_name:"Team Rocket",
+    address:"Street name here",
+    phone:"555-555-5555"
+  },
+  {
+    patron_id:2,
+    first_name:"Meowth",
+    last_name:"Thats right",
+    address:"Street name here",
+    phone:"555-555-5555"
+  }
+];
+
+
+var tempPublishersTable = [
+  {
+    publisher_id:0,
+    company_name:"Temp Name 1"
+  },
+  {
+    publisher_id:1,
+    company_name:"Temp Name 2"
+  }
+];
+
+
+var tempAuthorsData = [
+  {
+    author_id:0,
+    first_name:"Hello",
+    last_name: "world"
+  },
+  {
+    author_id:1,
+    first_name:"Another",
+    last_name:"Name"
+  }
+];
 
 
 /*
@@ -339,6 +388,77 @@ app.get("/patrons.html", (req, res)=>{
 });
 
 
+/*
+    PATRONS TABLE FUNCTIONS - HANDLES THE ADDITION, MODIFICATION, AND DELETION
+    OF A PATRON FROM THE TABLE.
+*/
+
+app.get("/patronsTable.html", (req, res)=>{
+  res.render("pages/patronsTable.ejs", {data: tempPatronsData, error:""})
+});
+
+
+app.post("/patronsTable", (req, res)=>{
+  console.log("booksTable POST", req.body);
+
+  // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
+
+  if(!req.body){
+    console.error("No req body");
+  }else{
+    var pid = removeSpecialCharacters(req.body.patron_id);
+    var fn = removeSpecialCharacters(req.body.first_name);
+    var ln = removeSpecialCharacters(req.body.last_name);
+    var add = req.body.address;
+    var ph =  req.body.phone;
+
+    // TODO: CLEAN ADDRESS BETTER
+
+    // validation of the POST request data.
+
+    if(!req.body || !pid || !fn || !ln || !add | !ph){
+      // user did not enter an item, give them an error and do not add the DATA
+      res.render("pages/patronsTable.ejs", {data:tempPatronsData, error:"Please enter all data fields."})
+    }else{
+      // adding the validated data to an object
+
+      // BEFORE ADDING WE ALSO NEED TO MAKE SURE THIS ISNT ALREADY IN THE TABLE
+      // OR IF DATA IS REPEATED
+
+      var temp = {
+        patron_id: pid,
+        first_name: fn,
+        last_name: ln,
+        address: add,
+        phone: ph,
+      };
+
+      // adding that object to the DB (in this case its a temp arra)
+      tempPatronsData.push(temp);
+
+      res.render("pages/patronsTable.ejs", {data:tempPatronsData, error:""});
+    }
+  }
+});
+
+
+app.put("/patronsTable", (req,res)=>{
+  // updates the item if there was a change
+  console.log(req.body);
+
+  // TODO: if only 1 thing was modified we dont wanna modify the entire table
+  // again right?
+  tempPatronsData["patron_id"] = req.body.patron_id;
+  tempPatronsData["first_name"] = req.body.first_name;
+  tempPatronsData["last_name"] = req.body.last_name;
+  tempPatronsData["address"] = req.body.address;
+  tempPatronsData["phone"] = req.body.phone;
+
+  res.send("got a PUT request");
+});
+
+
+
 
 /*
       FUNCTIONS TO HANDLE THE SEARCH OF PUBLISHERS AND SEARCH OF BOOK BY PUBLISHERS
@@ -411,13 +531,17 @@ app.get("/sections.html", (req, res)=>{
 });
 
 
+
 /*
    FUNCTIONS TO HANDLE THE SECTIONS TABLE, ALLOW FOR THE ADDITION, REMOVAL, AND
    MODIFICATION OF THE SECTIONS TABLE.
 */
+
+
 app.get("/sectionsTable.html", (req,res)=>{
   res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
 });
+
 
 
 app.post("/sectionsTable", (req, res)=>{
@@ -431,6 +555,8 @@ app.post("/sectionsTable", (req, res)=>{
   res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
 });
 
+
+
 app.put("/sectionsTable", (req, res)=>{
   // TODO: if only 1 thing was modified we dont wanna modify the entire table
   // again right?
@@ -440,9 +566,83 @@ app.put("/sectionsTable", (req, res)=>{
 });
 
 
+
+/*
+
+  FUNCTIONS FOR THE PUBLISHERS TABLE -- ALLOWS FOR THE ADDITION, REMOVAL, AND
+  MODIFICATION OF THE PUBLISHERS TABLE.
+
+*/
+
+
+app.get("/publishersTable.html", (req, res)=>{
+  res.render("pages/publishersTable.ejs", {data:tempPublishersTable, error:""});
+});
+
+
+
+app.post("/publishersTable", (req, res)=>{
+  console.log(req.body);
+  var temp={
+    publisher_id:removeSpecialCharacters(req.body.publisher_id),
+    company_name:removeSpecialCharacters(req.body.company_name)
+  };
+
+  console.log(tempPublishersTable);
+  tempPublishersTable.push(temp);
+  res.render("pages/publishersTable.ejs", {data:tempPublishersTable, error:""});
+});
+
+
+
+app.put("/publishersTable", (req, res)=>{
+  // TODO: if only 1 thing was modified we dont wanna modify the entire table
+  // again right?
+  tempPublishersTable["publisher_id"] = req.body.publisher_id;
+  tempPublishersTable["company_name"] = req.body.company_name;
+  res.send("got a PUT request");
+});
+
+
+
+/*
+
+  FUNCTIONS TO HANDLE THE AUTHORS TABLE.
+
+*/
+
+
+app.get("/authorsTable.html", (req, res)=>{
+  res.render("pages/authorsTable.ejs", {data:tempAuthorsData, error:""});
+});
+
+
+app.post("/authorsTable", (req, res)=>{
+  console.log(req.body);
+  var temp = {
+    author_id:removeSpecialCharacters(req.body.author_id),
+    first_name:removeSpecialCharacters(req.body.first_name),
+    last_name:removeSpecialCharacters(req.body.last_name)
+  };
+
+  tempAuthorsData.push(temp);
+  res.render("pages/authorsTable.ejs", {data:tempAuthorsData, error:""});
+});
+
+
+app.put("/authorsTable", (req, res)=>{
+  tempAuthorsData["author_id"] = req.body.author_id;
+  tempAuthorsData["first_name"] = req.body.first_name;
+  tempAuthorsData["last_name"] = req.body.last_name;
+  res.send("got a PUT request");
+});
+
+
+
 /*
       FUNCTIONS TO HANDLE THE SEARCH OF AUTHORS AND SEARCH OF BOOK BY AUTHORS
 */
+
 
 app.get("/authors.html", (req, res)=>{
 
@@ -476,6 +676,7 @@ app.get("/authors.html", (req, res)=>{
 
     FUNCTIONS TO HANDLE THE SIGN UP FOR A NEW PATORN
 */
+
 
 app.get("/signup.html", (req,res)=>{
   var data={
@@ -514,11 +715,14 @@ app.post("/signup", (req, res)=>{
 });
 
 
+
 /*
 
   FUNCTIONS FOR THE MAIN SEARCH BAR
 
 */
+
+
 app.post("/search", (req,res)=>{
   if(!req.body){
     // somehow the body has nothing
@@ -658,6 +862,7 @@ function removeSpecialCharacters(toRemove){
   }
   return toRemove;
 }
+
 
 
 
