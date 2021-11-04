@@ -1,0 +1,47 @@
+<%- include ("../partials/header") %>
+
+  <div class="myContainer center element-col">
+    <%if(error!=""){%>
+      <div class="not-avail"><%=error%></div>
+    <%}%>
+    <!-- form to add data -->
+    <form class="addData" onSubmit="addAndValidateFormCheckedOut()">
+      <label for="patron_id">patron_id:</label>
+      <input type="number" name="patron_id" class="form-control">
+
+      <label for="book_id">book_id:</label>
+      <input type="number" name="book_id" class="form-control">
+
+      <br/>
+      <button value="/CheckedOutBooks" class="btn btn-dark" type="Submit">Add</button>
+      <div class="not-avail" id="data-add-error"></div>
+    </form>
+
+    <!-- form to show data in table-->
+    <table>
+      <tr>
+        <th><u>patron_id</u></th>
+        <th>book_id</th>
+
+        <th>Modify</th>
+        <th>Delete</th>
+      </tr>
+      <% for(var i = 0; i<data.length; i++){%>
+
+        <tr>
+          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormCheckedOut(<%=data[i].patron_id%>)">
+            <td><input type="number" name="patron_id" placeholder="<%=data[i].patron_id%>" value="<%=data[i].patron_id%>"></td>
+            <td><input type="number" name="book_id" placeholder="<%=data[i].book_id%>" value ="<%=data[i].book_id%>"> </td>
+
+            <td><button class="btn btn-dark" name="modify" value="<%=data[i].patron_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
+          </form>
+          <td><form onsubmit="checkedOutTableRemoval(<%= data[i].patron_id %>)"><button value ="<%= data[i].patron_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+        </tr>
+
+      <%}%>
+
+    </table>
+
+  </div>
+
+<%- include ("../partials/footer") %>

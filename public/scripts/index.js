@@ -375,6 +375,129 @@ const authorsTableRemoval = async (i)=>{
 };
 
 
+/*
+
+  FUNCTIONS FOR THE CHECKEDOUTBOOKS TABLE
+
+*/
+
+const addAndValidateFormCheckedOut = async ()=>{
+  event.preventDefault();
+  let temp = document.getElementsByClassName("addData");
+  let toSubmit = temp;
+  console.log("here");
+
+  var data={
+    patron_id:"",
+    book_id:""
+  };
+
+
+
+  for(var i=0; i<temp[0].length-1; i++){
+    data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
+  }
+  if(data.patron_id == "" || data.book_id == ""){
+    document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+
+  }else{
+    // sending the data to the server
+
+    reqServer("POST", "/CheckedOutBooks", data);
+  }
+
+};
+
+
+
+const validateFormCheckedOut = async (i)=>{
+  event.preventDefault();
+  let temp = document.getElementsByClassName("row-data");
+  let toSubmit = temp[i];
+
+  var data={
+    patron_id:"",
+    book_id:""
+  };
+
+  for(var j=0; j<toSubmit.length; j++){
+    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+  }
+  // after data clean
+  reqServer("PUT", "/CheckedOutBooks", data);
+};
+
+
+
+const checkedOutTableRemoval = async (i)=>{
+  event.preventDefault();
+  console.log("Delete", i);
+};
+
+
+/*
+
+  FUNCTIONS TO HANDLE BOOKAUTHORS TABLE
+
+*/
+
+const addAndValidateFormBookAuthors = async ()=>{
+  event.preventDefault();
+  let temp = document.getElementsByClassName("addData");
+  let toSubmit = temp;
+  console.log("here");
+
+  var data={
+    author_id:"",
+    book_id:""
+  };
+
+
+
+  for(var i=0; i<temp[0].length-1; i++){
+    data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
+  }
+  if(data.author_id == "" || data.book_id == ""){
+    document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+
+  }else{
+    // sending the data to the server
+
+    reqServer("POST", "/BookAuthors", data);
+  }
+
+};
+
+
+
+const validateFormBookAuthors = async (i)=>{
+  event.preventDefault();
+  let temp = document.getElementsByClassName("row-data");
+  let toSubmit = temp[i];
+
+  var data={
+    author_id:"",
+    book_id:""
+  };
+
+  for(var j=0; j<toSubmit.length; j++){
+    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+  }
+  // after data clean
+  reqServer("PUT", "/BookAuthors", data);
+};
+
+
+
+const bookAuthorsTableRemoval = async (i)=>{
+  event.preventDefault();
+  console.log("Delete", i);
+};
+
+
+
+
+
 
 /*
    FUNCTION TO REQUEST THE SERVER WITH REQUEST TYPE, DATA AND LOCATION
