@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
-const PORT = 3000;
+const PORT = 8632;
 /*
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   NOTE: IN THE INDEX.JS FILE THE BASE URL THAT NEEDS TO BE CHANGED
