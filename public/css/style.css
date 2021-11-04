@@ -82,6 +82,10 @@ html,body{
   background-color:lightgray;
 }
 
+.single-item h1 {
+    padding-top: 1rem;
+}
+
 
 
 /*
@@ -106,4 +110,13 @@ html,body{
   */
   font-size:1.2rem;
   color:red;
+}
+
+
+input {
+    width: 120px;
+}
+
+.addData button {
+    margin-top: 10px;
 }
