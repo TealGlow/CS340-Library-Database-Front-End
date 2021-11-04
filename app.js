@@ -6,6 +6,12 @@ const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
 const PORT = 3000;
+/*
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  NOTE: IN THE INDEX.JS FILE THE BASE URL THAT NEEDS TO BE CHANGED
+  FOR THE FLIP SERVER!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+*/
 
 // set up ejs as the view engine
 app.set('view engine', 'ejs');
@@ -114,6 +120,40 @@ var tempAuthorsData = [
     last_name:"Name"
   }
 ];
+
+
+var tempCheckedOutBooksData=[
+  {
+    patron_id:1,
+    book_id:1
+  },
+  {
+    patron_id:1,
+    book_id:0
+  },
+  {
+    patron_id:2,
+    book_id:0
+  }
+];
+
+
+
+var tempBookAuthorsData=[
+  {
+    author_id:1,
+    book_id:1
+  },
+  {
+    author_id:1,
+    book_id:0
+  },
+  {
+    author_id:2,
+    book_id:0
+  }
+];
+
 
 
 /*
@@ -639,6 +679,68 @@ app.put("/authorsTable", (req, res)=>{
 
 
 
+
+
+/*
+  FUNCTION THAT HANDLES THE CHECKEDOUTBOOKS TABLE
+*/
+
+app.get("/CheckedOutBooks.html", (req, res)=>{
+    res.render("pages/CheckedOutBooks.ejs", {data:tempCheckedOutBooksData, error:""});
+});
+
+
+app.post("/CheckedOutBooks", (req, res)=>{
+    console.log(req.body);
+    var temp = {
+        patron_id:removeSpecialCharacters(req.body.patron_id),
+        book_id:removeSpecialCharacters(req.body.book_id)
+    };
+
+    tempCheckedOutBooksData.push(temp);
+    res.render("pages/CheckedOutBooks.ejs", {data:tempCheckedOutBooksData, error:""});
+
+});
+
+
+app.put("/CheckedOutBooks", (req, res)=>{
+  tempCheckedOutBooksData["patron_id"] = req.body.patron_id;
+  tempCheckedOutBooksData["book_id"] = req.body.book_id;
+  res.send("got a PUT request");
+});
+
+
+/*
+
+  FUNCTIONS THAT HANDLE THE BOOKAUTHORS TABLE
+
+*/
+
+app.get("/BookAuthors.html", (req, res)=>{
+  res.render("pages/BookAuthors.ejs", {data:tempBookAuthorsData, error:""});
+});
+
+
+app.post("/BookAuthors", (req, res)=>{
+    console.log(req.body);
+    var temp = {
+        author_id:removeSpecialCharacters(req.body.author_id),
+        book_id:removeSpecialCharacters(req.body.book_id)
+    };
+
+    tempBookAuthorsData.push(temp);
+    res.render("pages/BookAuthors.ejs", {data:tempBookAuthorsData, error:""});
+
+});
+
+
+app.put("/BookAuthors", (req, res)=>{
+  tempBookAuthorsData["author_id"] = req.body.author_id;
+  tempBookAuthorsData["book_id"] = req.body.book_id;
+  res.send("got a PUT request");
+});
+
+
 /*
       FUNCTIONS TO HANDLE THE SEARCH OF AUTHORS AND SEARCH OF BOOK BY AUTHORS
 */
@@ -837,8 +939,6 @@ app.get("/search", (req,res)=>{
   // get request to /search will just send them back to main right now, can be changed if needed
   res.redirect("/index.html");
 });
-
-
 
 
 
