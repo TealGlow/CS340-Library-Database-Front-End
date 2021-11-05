@@ -1,7 +1,6 @@
 const BASE_URL = "http://localhost:3000";
 
 
-
 /*
 
   FUNCTIONS FOR FORM VALIDATION ON THE BOOKS TABLE
