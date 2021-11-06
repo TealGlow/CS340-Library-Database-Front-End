@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://"+window.location.hostname+":"+window.location.port;
 
 
 /*
@@ -15,6 +15,7 @@ const addAndValidateFormBooks = async ()=>{
 
     // TO DO: DONT LET USER ENTER INCORRECT DATA
 
+    console.log(BASE_URL);
     let temp = document.getElementsByClassName("addData");
     var data={
       book_id:"",

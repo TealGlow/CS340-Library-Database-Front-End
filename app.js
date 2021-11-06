@@ -1,22 +1,23 @@
 const express = require("express");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
+const mysql = require('./dbcon.js');
 
 const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
 const PORT = 8632;
-/*
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  NOTE: IN THE INDEX.JS FILE THE BASE URL THAT NEEDS TO BE CHANGED
-  FOR THE FLIP SERVER!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-*/
+
 
 // set up ejs as the view engine
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
 app.use(express.json());
+
+/*
+  MYSQL portion
+*/
+//app.set('mysql', mysql);
 
 app.use(bodyParser.urlencoded({extended: true}));
 

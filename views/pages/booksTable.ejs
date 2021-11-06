@@ -29,10 +29,10 @@
 
       <label >on_shelf:</label>
       <input type ="checkbox" name="on_shelf">
-      
+
       <button class="btn btn-dark" type="Submit">Add</button>
       <div class="not-avail" id="data-add-error"></div>
-      
+
     <br/>
     <br/>
 
@@ -63,7 +63,7 @@
             <td><input type = "date" name="publication" placeholder="<%=data[i].publication%>" value ="<%=data[i].publication%>"> </td>
             <td><input type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" value ="<%=data[i].publisher_id%>"></td>
             <td><input type="number" name="section_id" placeholder="<%=data[i].section_id%>" value ="<%=data[i].section_id%>"></td>
-            <td><input type ="checkbox" name="on_shelf" placeholder="<%=data[i].on_shelf%>" value ="<%=data[i].on_shelf%>"></td>
+            <td><input type ="checkbox" name="on_shelf" placeholder="<%=data[i].on_shelf%>" <%if(data[i].on_shelf == true){%>checked="<%=data[i].on_shelf%>"<%}%> value ="<%=data[i].on_shelf%>"></td>
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].book_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
           <td><form onsubmit="booksTableRemoval(<%= data[i].book_id %>)"><button value ="<%= data[i].book_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
