@@ -18,7 +18,24 @@ app.use(express.json());
   MYSQL portion
 */
 app.set('mysql', mysql);
-//app.use("/test", require("./test.js"));
+
+/*
+  Queries
+*/
+var tableName = "";
+
+const selectQuery = selectQ`SELECT * FROM ${tableName}`; // use this for all tables
+const insertBooksQuery = `INSERT INTO Books (book_id, isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?,?);`;
+
+
+function selectQ(tblName){
+  // template selectQuery
+  return  `SELECT * FROM ${tblName};`;
+};
+
+
+
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -27,39 +44,6 @@ app.use(bodyParser.urlencoded({extended: true}));
   FAKE data
 
 */
-var tempBookShow = [
-    {
-      book_id:0,
-      isbn:0000000,
-      title:"Book title 1",
-      pages:300,
-      publication:'1999-01-02',
-      publisher_id:0, //FK
-      section_id:0,  //FK
-      on_shelf:true,
-    },
-    {
-      book_id:1,
-      isbn:1111111,
-      title:"Book title 2",
-      pages:300,
-      publication:'1999-01-03',
-      publisher_id:1, //FK
-      section_id:1,  //FK
-      on_shelf:false,
-    },
-    {
-      book_id:2,
-      isbn:222222,
-      title:"Book title 3",
-      pages:300,
-      publication:'1999-01-05',
-      publisher_id:2, //FK
-      section_id:2,  //FK
-      on_shelf:true,
-    },
-];
-
 
 var tempSectionData=[
   {
@@ -138,7 +122,6 @@ var tempCheckedOutBooksData=[
     book_id:0
   }
 ];
-
 
 
 var tempBookAuthorsData=[
@@ -305,12 +288,14 @@ app.get("/books.html", (req, res)=>{
 */
 app.get("/booksTable.html", (req, res)=>{
     // shows all the data in the books table
-
-    mysql.pool.query("SELECT * FROM Books", (err, rows, fields)=>{
+    console.log(selectQ("Books"));
+    
+    mysql.pool.query(selectQ("Books"), (err, rows, fields)=>{
       // get the books table!
       if(err){
         // if there was an error, throw the error
         console.error(err);
+        res.render("pages/booksTable.ejs", {data:"", error:"Error getting table data"});
       }else{
         // else do something with the data
         console.log(rows);
@@ -343,8 +328,19 @@ app.post("/booksTable", (req, res)=>{
     var sid = removeSpecialCharacters(req.body.section_id);
     var ons = removeSpecialCharacters(req.body.on_shelf);
 
+    var context={};
     // validation of the POST request data.
-
+    mysql.pool.query(insertBooksQuery, [bid, isb, ti, pa, pub, pid, sid, ons], (err, result)=>{
+      if(err){
+        console.error(err);
+      }else{
+        console.log("success");
+        context.results = "Inserted id " + result.insertId;
+        res.send(context);
+        res.redirect("/booksTable.html");
+      }
+    });
+    /*
     if(!req.body || !bid || !isb || !ti || !pa || !pub || !pid || !sid  || !ons){
       // user did not enter an item, give them an error and do not add the DATA
       res.render("pages/booksTable.ejs", {data:tempBookShow, error:"Please enter all data fields."})
@@ -369,7 +365,7 @@ app.post("/booksTable", (req, res)=>{
       tempBookShow.push(temp);
 
       res.render("pages/booksTable.ejs", {data:tempBookShow, error:""});
-    }
+    }*/
   }
 
 
