@@ -6,7 +6,7 @@ const mysql = require('./dbcon.js');
 const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
-const PORT = 8632;
+const PORT = 8636;
 
 
 // set up ejs as the view engine
@@ -17,7 +17,8 @@ app.use(express.json());
 /*
   MYSQL portion
 */
-//app.set('mysql', mysql);
+app.set('mysql', mysql);
+//app.use("/test", require("./test.js"));
 
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -304,8 +305,21 @@ app.get("/books.html", (req, res)=>{
 */
 app.get("/booksTable.html", (req, res)=>{
     // shows all the data in the books table
+
+    mysql.pool.query("SELECT * FROM Books", (err, rows, fields)=>{
+      // get the books table!
+      if(err){
+        // if there was an error, throw the error
+        console.error(err);
+      }else{
+        // else do something with the data
+        console.log(rows);
+        res.render("pages/booksTable.ejs", {data:rows, error:""});
+      }
+    });
+
     console.log("booksTable GET");
-    res.render("pages/booksTable.ejs", {data:tempBookShow, error:""});
+    //res.render("pages/booksTable.ejs", {data:rows, error:""});
 });
 
 /*
