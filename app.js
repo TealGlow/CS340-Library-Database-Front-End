@@ -26,6 +26,7 @@ var tableName = "";
 
 const selectQuery = selectQ`SELECT * FROM ${tableName}`; // use this for all tables
 const insertBooksQuery = `INSERT INTO Books (book_id, isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?,?);`;
+const insertPatronsQuery = `INSERT INTO Patrons (patron_id, first_name, last_name, address, phone) VALUES (?,?,?,?,?);`;
 
 
 function selectQ(tblName){
@@ -45,41 +46,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 */
 
-var tempSectionData=[
-  {
-    section_id:0,
-    section_name:"Computer Science"
-  },
-  {
-    section_id:1,
-    section_name:"Art"
-  }
-];
-
-
-var tempPatronsData=[
-  {
-    patron_id:0,
-    first_name:"Jesse",
-    last_name:"Team Rocket",
-    address:"Street name here",
-    phone:"555-555-5555"
-  },
-  {
-    patron_id:1,
-    first_name:"James",
-    last_name:"Team Rocket",
-    address:"Street name here",
-    phone:"555-555-5555"
-  },
-  {
-    patron_id:2,
-    first_name:"Meowth",
-    last_name:"Thats right",
-    address:"Street name here",
-    phone:"555-555-5555"
-  }
-];
 
 
 var tempPublishersTable = [
@@ -168,68 +134,6 @@ app.get("/index.html", (req, res)=>{
 
 
 
-/*
-      FUNCTIONS TO HANDLE THE CHECK OUT OF A BOOK AND FORM VALIDATION FOR
-      BOOK CHECK OUT PAGES.
-*/
-
-app.post("/handleCheckOut.html", (req,res)=>{
-  // handles the user check out form 1 where we are assuming the patron
-  // is already in the system, we need to make another page for when the
-  // patron needs to sign up
-
-  if(req.body.on_shelf){
-    res.render("pages/handleCheckOut.ejs", {data:req.body});
-  }
-
-});
-
-
-
-app.get("/handleCheckOut.html", (req,res)=>{
-  // we do not get here from a get request
-  // if the user goes to this page without selecting a book to checkout
-  // they will be sent back to index.html
-  res.redirect("/index.html");
-});
-
-
-
-app.post("/validateFormCheckOut", (req,res)=>{
-  // validates the form, if there is an error we send the user an error.
-
-  // function that removes special characters from the user input
-  // so that they cant do stuff like dropping our tables.
-  var first_name = removeSpecialCharacters(req.body.firstName);
-  var last_name = removeSpecialCharacters(req.body.lastName);
-
-
-  var data={
-    title:req.body.title,
-    book_id:req.body.book_id,
-    firstName:first_name,
-    lastName:last_name,
-    error:""
-  };
-
-  if(!data.firstName || !data.lastName){
-    // error with their first or last name, give them an error.
-
-    data.error="Please enter a first and last name!";
-    res.render("pages/handleCheckOut.ejs", {data:data});
-  }else{
-    // assuming this is a new patron we need to
-    // query the db for their information and then find the book
-    // matching that id, change the status in the db
-
-    // if we cannot find that patron we should redirect them to a page to sign
-    // up instead, but that can be done later.
-    console.log("sending to success");
-    res.render("pages/success.ejs", {data:data, signup:""});
-  }
-});
-
-
 
 app.get("/books.html", (req, res)=>{
   // for now this displays all the books in the library
@@ -302,9 +206,6 @@ app.get("/booksTable.html", (req, res)=>{
         res.render("pages/booksTable.ejs", {data:rows, error:""});
       }
     });
-
-    console.log("booksTable GET");
-    //res.render("pages/booksTable.ejs", {data:rows, error:""});
 });
 
 /*
@@ -326,51 +227,31 @@ app.post("/booksTable", (req, res)=>{
     var pub = req.body.publication;
     var pid = removeSpecialCharacters(req.body.publisher_id);
     var sid = removeSpecialCharacters(req.body.section_id);
-    var ons = removeSpecialCharacters(req.body.on_shelf);
+    var ons = false;
+
+    if(req.body.on_shelf == "on"){
+      ons = true;
+    }
 
     var context={};
     // validation of the POST request data.
     mysql.pool.query(insertBooksQuery, [bid, isb, ti, pa, pub, pid, sid, ons], (err, result)=>{
       if(err){
         console.error(err);
+        return;
       }else{
+        // successfully added new item
         console.log("success");
         context.results = "Inserted id " + result.insertId;
-        res.send(context);
-        res.redirect("/booksTable.html");
+        return;
       }
     });
-    /*
-    if(!req.body || !bid || !isb || !ti || !pa || !pub || !pid || !sid  || !ons){
-      // user did not enter an item, give them an error and do not add the DATA
-      res.render("pages/booksTable.ejs", {data:tempBookShow, error:"Please enter all data fields."})
-    }else{
-      // adding the validated data to an object
-
-      // BEFORE ADDING WE ALSO NEED TO MAKE SURE THIS ISNT ALREADY IN THE TABLE
-      // OR IF DATA IS REPEATED
-
-      var temp = {
-        book_id: bid,
-        isbn: isb,
-        title: ti,
-        pages: pa,
-        publication: pub,
-        publisher_id: pid,
-        section_id: sid,
-        on_shelf: ons
-      };
-
-      // adding that object to the DB (in this case its a temp arra)
-      tempBookShow.push(temp);
-
-      res.render("pages/booksTable.ejs", {data:tempBookShow, error:""});
-    }*/
+    // redirect to page to show data.
+    res.redirect("/booksTable.html");
   }
 
 
 });
-
 
 
 /*
@@ -395,7 +276,6 @@ app.put("/booksTable", (req,res)=>{
 });
 
 
-
 /*
 delete
 */
@@ -406,46 +286,25 @@ app.delete("/booksTable.html", (req, res)=>{
 
 
 /*
-      FUNCTIONS TO HANDLE THE ADDITION AND SEARCH OF A PATRON.
-*/
-app.get("/patrons.html", (req, res)=>{
-  // serving up the patrons page
-    var tempPatrons = [
-        {
-            patron_id: 1,
-            first_name: "Tony",
-            last_name: "Stark",
-            address: "1234 56th Ave, New York, NY 98765",
-            phone: "555-511-2433"
-        },
-        {
-            patron_id: 2,
-            first_name: "Bruce",
-            last_name: "Banner",
-            address: "7890 42nd Ave, New York, NY 98765",
-            phone: "555-424-6657"
-        },
-        {
-            patron_id: 3,
-            first_name: "Steve",
-            last_name: "Rogers",
-            address: "3857 26th Ave, New York, NY 98765",
-            phone: "555-243-7345"
-        }
-    ]
-
-    // serving up the patrons page
-    res.render("pages/patrons.ejs", {data:tempPatrons});
-});
-
-
-/*
     PATRONS TABLE FUNCTIONS - HANDLES THE ADDITION, MODIFICATION, AND DELETION
     OF A PATRON FROM THE TABLE.
 */
 
 app.get("/patronsTable.html", (req, res)=>{
-  res.render("pages/patronsTable.ejs", {data: tempPatronsData, error:""})
+    
+  mysql.pool.query(selectQ("Patrons"), (err, rows, fields)=>{
+    // get the patrons table
+    if(err){
+      // if there was an error, throw the error
+      console.error(err);
+      res.render("pages/patronsTable.ejs", {data:"", error:"Error getting table data"});
+    }else{
+      // else do something with the data
+      console.log(rows);
+      res.render("pages/patronsTable.ejs", {data:rows, error:""});
+    }
+  });
+
 });
 
 
@@ -457,7 +316,7 @@ app.post("/patronsTable", (req, res)=>{
   if(!req.body){
     console.error("No req body");
   }else{
-    var pid = removeSpecialCharacters(req.body.patron_id);
+    var pid = parseInt(removeSpecialCharacters(req.body.patron_id));
     var fn = removeSpecialCharacters(req.body.first_name);
     var ln = removeSpecialCharacters(req.body.last_name);
     var add = req.body.address;
@@ -471,23 +330,25 @@ app.post("/patronsTable", (req, res)=>{
       // user did not enter an item, give them an error and do not add the DATA
       res.render("pages/patronsTable.ejs", {data:tempPatronsData, error:"Please enter all data fields."})
     }else{
-      // adding the validated data to an object
-
-      // BEFORE ADDING WE ALSO NEED TO MAKE SURE THIS ISNT ALREADY IN THE TABLE
-      // OR IF DATA IS REPEATED
-
-      var temp = {
-        patron_id: pid,
-        first_name: fn,
-        last_name: ln,
-        address: add,
-        phone: ph,
-      };
-
-      // adding that object to the DB (in this case its a temp arra)
-      tempPatronsData.push(temp);
-
-      res.render("pages/patronsTable.ejs", {data:tempPatronsData, error:""});
+      if(req.body.on_shelf == "on"){
+        ons = true;
+      }
+  
+      var context={};
+      // validation of the POST request data.
+      mysql.pool.query(insertPatronsQuery, [pid, fn, ln, add, ph], (err, result)=>{
+        if(err){
+          console.error(err);
+          return;
+        }else{
+          // successfully added new item
+          console.log("success");
+          context.results = "Inserted id " + result.insertId;
+          return;
+        }
+      });
+      // redirect to page to show data.
+      res.redirect("/patronsTable.html");
     }
   }
 });
@@ -507,80 +368,6 @@ app.put("/patronsTable", (req,res)=>{
 
   res.send("got a PUT request");
 });
-
-
-
-
-/*
-      FUNCTIONS TO HANDLE THE SEARCH OF PUBLISHERS AND SEARCH OF BOOK BY PUBLISHERS
-*/
-
-app.get("/publishers.html", (req, res)=>{
-  var tempPublishers = [
-        {
-            publisher_id: 1,
-            company_name: "Penguin"
-        },
-        {
-            publisher_id: 2,
-            company_name: "Macmillan"
-        },
-        {
-            publisher_id: 3,
-            company_name: "Harper Collins"
-        }
-    ]
-
-    // serving up the publishers page
-    res.render("pages/publishers.ejs", { data: tempPublishers } );
-});
-
-
-
-/*
-      FUNCTION TO HANDLE THE SEARCH OF SECTIONS AND SEARCH OF BOOKS BY SECTIONS
-*/
-
-
-app.get("/sections.html", (req, res)=>{
-  // for now this displays all the sections with fake data.
-
-  // we want the section to display the books in the section right?
-  // I'm assuming that we are getting a count of the union of Books and Sections here
-
-  // this is where the query would go for showing all sections though
-  var tempSections =[
-      {
-        section_id:1,
-        section_name:"Science",
-        number_of_books:10
-      },
-      {
-        section_id:2,
-        section_name:"Art",
-        number_of_books:2
-      },
-      {
-        section_id:3,
-        section_name:"Computer Science",
-        number_of_books:150
-      },
-      {
-        section_id:4,
-        section_name:"Fiction",
-        number_of_books:150
-      },
-      {
-        section_id:5,
-        section_name:"Non-Fiction",
-        number_of_books:150
-      }
-  ];
-
-  // renders the sections page with the data above.
-  res.render("pages/sections.ejs", {data: tempSections});
-});
-
 
 
 /*
@@ -751,81 +538,6 @@ app.put("/BookAuthors", (req, res)=>{
   res.send("got a PUT request");
 });
 
-
-/*
-      FUNCTIONS TO HANDLE THE SEARCH OF AUTHORS AND SEARCH OF BOOK BY AUTHORS
-*/
-
-
-app.get("/authors.html", (req, res)=>{
-
-    var tempAuthors = [
-        {
-            author_id: 1,
-            first_name: "Mark",
-            last_name: "Twain",
-            quantity:10
-        },
-        {
-            author_id: 2,
-            first_name: "Charles",
-            last_name: "Dickens",
-            quantity:10
-        },
-        {
-            author_id: 3,
-            first_name: "John",
-            last_name: "Steinbeck",
-            quantity:10
-        }
-    ];
-
-    res.render("pages/authors.ejs", { data: tempAuthors, searchTitle:"" } );
-});
-
-
-
-/*
-
-    FUNCTIONS TO HANDLE THE SIGN UP FOR A NEW PATORN
-*/
-
-
-app.get("/signup.html", (req,res)=>{
-  var data={
-    error:""
-  };
-
-  res.render("pages/signup.ejs", {data:data});
-});
-
-
-
-app.post("/signup", (req, res)=>{
-
-  if(!req.body.firstName || !req.body.lastName || !req.body.phone || !req.body.address || req.body.firstName=="" || req.body.lastName=="" || req.body.phone=="" || req.body.address==""){
-    // user did not enter all the data needed
-    var data={
-      error:"Please enter all the fields."
-    };
-    res.render("pages/signup.ejs", {data:data});
-  }else{
-    // all the information exists, clean it
-    if(req.body){
-      var data={
-        first_name:removeSpecialCharacters(req.body.firstName),
-        last_name:removeSpecialCharacters(req.body.lastName),
-        phone:removeSpecialCharacters(req.body.phone),
-        address:removeSpecialCharacters(req.body.address)
-      };
-
-      // handle sending the data to the DB HERE
-
-      res.render("pages/success.ejs", {signup:data, data:""});
-    }
-  }
-
-});
 
 
 
