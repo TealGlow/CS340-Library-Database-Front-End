@@ -35,7 +35,7 @@ const addAndValidateFormBooks = async ()=>{
     for(var i=0; i<temp[0].length-1; i++){
       data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
     }
-    data["publication"] = $(temp)[0][4].value;
+    data["publication"] = new Date($(temp)[0][4].value);
 
     if(data["book_id"] == "" || data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == "" || data["on_shelf"] == ""){
       console.log("Error please enter all data fields!");
