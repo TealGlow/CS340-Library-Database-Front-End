@@ -56,6 +56,11 @@ const validateFormBooks = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
+  // prev id
+  console.log(parseInt(toSubmit[toSubmit.length-1].value));
+  // row id
+  console.log(i);
+
   var data={
     "book_id":"",
     "isbn":"",
@@ -65,12 +70,21 @@ const validateFormBooks = async (i)=>{
     "publisher_id":"",
     "section_id":"",
     "on_shelf":"",
-    "prev_id":i
+    "prev_id":parseInt(toSubmit[toSubmit.length-1].value)
   };
 
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
+  data["book_id"] = parseInt(data["book_id"]);
+  data["pages"] = parseInt(data["pages"]);
+  data["publisher_id"] = parseInt(data["publisher_id"]);
+  data["section_id"] = parseInt(data["section_id"]);
+  data["isbn"] = toSubmit[1].value;
+  data["publication"] = toSubmit[4].value;
+
+  console.log(data);
+
   // after data clean
   reqServer("PUT", "/booksTable", data);
 
@@ -243,6 +257,7 @@ const addAndValidateFormPublishers = async ()=>{
   // TO DO: DONT LET USER ENTER INCORRECT DATA
 
   let temp = document.getElementsByClassName("addData");
+
   var data={
     publisher_id:"",
     company_name:"",
@@ -276,17 +291,19 @@ const validateFormPublishers = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
-
+  console.log(i, toSubmit);
   var data={
-    "publisher_id":"",
-    "company_name":"",
-    "prev_id":i
+    publisher_id:"",
+    company_name:"",
+    prev_id:parseInt(toSubmit[0].placeholder)
   };
 
 
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
+
+  data["publisher_id"] = parseInt(data["publisher_id"]);
 
   // after data clean
   reqServer("PUT", "/publishersTable", data);
@@ -385,13 +402,11 @@ const addAndValidateFormCheckedOut = async ()=>{
   event.preventDefault();
   let temp = document.getElementsByClassName("addData");
   let toSubmit = temp;
-  console.log("here");
 
   var data={
     patron_id:"",
     book_id:""
   };
-
 
 
   for(var i=0; i<temp[0].length-1; i++){
@@ -412,12 +427,21 @@ const addAndValidateFormCheckedOut = async ()=>{
 
 const validateFormCheckedOut = async (i)=>{
   event.preventDefault();
+
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
+  // i = Index
+
+  console.log("update!", i);
+  console.log(toSubmit[0].placeholder, toSubmit[1].placeholder);
+
   var data={
     patron_id:"",
-    book_id:""
+    book_id:"",
+    prev_patron_id: parseInt(toSubmit[0].placeholder),
+    prev_book_id: parseInt(toSubmit[1].placeholder),
+    row:(parseInt(i)+1)
   };
 
   for(var j=0; j<toSubmit.length; j++){
@@ -445,7 +469,6 @@ const addAndValidateFormBookAuthors = async ()=>{
   event.preventDefault();
   let temp = document.getElementsByClassName("addData");
   let toSubmit = temp;
-  console.log("here");
 
   var data={
     author_id:"",
@@ -475,13 +498,20 @@ const validateFormBookAuthors = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
+  // i = row Index
+  //
+
+  console.log(i, toSubmit);
+
   var data={
     author_id:"",
-    book_id:""
+    book_id:"",
+    prev_author_id:parseInt(toSubmit[0].placeholder),
+    prev_book_id:parseInt(toSubmit[1].placeholder)
   };
 
   for(var j=0; j<toSubmit.length; j++){
-    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+    data[$(toSubmit)[0][j].name] = parseInt(await cleanData($(toSubmit)[0][j].value));
   }
   // after data clean
   reqServer("PUT", "/BookAuthors", data);
