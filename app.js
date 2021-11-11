@@ -29,9 +29,19 @@ const insertBooksQuery = `INSERT INTO Books (book_id, isbn, title, pages, public
 const insertPatronsQuery = `INSERT INTO Patrons (patron_id, first_name, last_name, address, phone) VALUES (?,?,?,?,?);`;
 
 
+// testing modify query.
+const modifyBooksQuery = `UPDATE Books SET book_id=?, isbn=?, title=?, pages=?, publication=?, publisher_id=?, section_id=?, on_shelf=? WHERE book_id=?`;
+const searchById = `SELECT * FROM ${tableName} WHERE ${idName}=?`;
+
+
+
 function selectQ(tblName){
   // template selectQuery
   return  `SELECT * FROM ${tblName};`;
+};
+
+function setSearchByIdNameAndId(tblName, idName){
+  return `SELECT * FROM ${tblName} WHERE ${idName}=?`;
 };
 
 
@@ -193,7 +203,7 @@ app.get("/books.html", (req, res)=>{
 app.get("/booksTable.html", (req, res)=>{
     // shows all the data in the books table
     console.log(selectQ("Books"));
-    
+
     mysql.pool.query(selectQ("Books"), (err, rows, fields)=>{
       // get the books table!
       if(err){
@@ -260,19 +270,47 @@ update
 
 app.put("/booksTable", (req,res)=>{
   // updates the item if there was a change
-  console.log(req.body);
+  console.log("hello",req.body);
 
-  // TODO: if only 1 thing was modified we dont wanna modify the entire table
-  // again right?
-  tempBookShow["book_id"] = req.body.book_id;
-  tempBookShow["isbn"] = req.body.isbn;
-  tempBookShow["title"] = req.body.title;
-  tempBookShow["pages"] = req.body.pages;
-  tempBookShow["publication"] = req.body.publication;
-  tempBookShow["publisher_id"] = req.body.publisher_id;
-  tempBookShow["section_id"] = req.body.section_id;
-  tempBookShow["on_shelf"] = req.body.on_shelf;
-  res.send("got a PUT request");
+  var context = {};
+  mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.prev_id || req.query.prev_id], (err, result)=>{
+    if(err){
+      return;
+    }else{
+      console.log("got the row to change:");
+      // update items where
+      if(result.length == 1){
+        var tempCurrentValues = result[0];
+        // query the db to change items if they changed at all! else keep the current values
+        mysql.pool.query(modifyBooksQuery, [
+          req.body.book_id|| req.query.book_id || tempCurrentValues.book_id,
+          req.body.isbn || req.query.isbn || tempCurrentValues.isbn,
+          req.body.title || req.query.title || tempCurrentValues.title,
+          req.body.pages || req.query.pages || tempCurrentValues.pages,
+          req.body.publication || req.query.publication || tempCurrentValues.publication,
+          req.body.publisher_id || req.query.publisher_id || tempCurrentValues.publisher_id,
+          req.body.section_id || req.query.section_id || tempCurrentValues.section_id,
+          req.body.on_shelf || req.query.on_shelf || tempCurrentValues.on_shelf,
+          req.body.prev_id || req.query.prev_id], (err, result)=>{
+          // update here
+          if(err){
+            console.error(err);
+            return;
+          }else{
+            console.log("updated!");
+            return;
+          }
+        });
+        return;
+      }else{
+        console.error("Couldn't update row");
+        return;
+      }
+    }
+  });
+
+  // NOTE: DOES NOT REDIRECT FOR SOME REASON?
+  res.redirect("/booksTable.html");
 });
 
 
@@ -291,7 +329,7 @@ app.delete("/booksTable.html", (req, res)=>{
 */
 
 app.get("/patronsTable.html", (req, res)=>{
-    
+
   mysql.pool.query(selectQ("Patrons"), (err, rows, fields)=>{
     // get the patrons table
     if(err){
@@ -333,7 +371,7 @@ app.post("/patronsTable", (req, res)=>{
       if(req.body.on_shelf == "on"){
         ons = true;
       }
-  
+
       var context={};
       // validation of the POST request data.
       mysql.pool.query(insertPatronsQuery, [pid, fn, ln, add, ph], (err, result)=>{

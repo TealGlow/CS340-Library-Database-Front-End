@@ -65,12 +65,18 @@ const validateFormBooks = async (i)=>{
     "publisher_id":"",
     "section_id":"",
     "on_shelf":"",
-    "prev_id":i
+    "prev_id":parseInt(toSubmit[toSubmit.length-1].value)
   };
 
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
+  data["book_id"] = parseInt(data["book_id"]);
+  data["pages"] = parseInt(data["pages"]);
+  data["publisher_id"] = parseInt(data["publisher_id"]);
+  data["section_id"] = parseInt(data["section_id"]);
+  data["isbn"] = toSubmit[1].value;
+  data["publication"] = toSubmit[4].value;
   // after data clean
   reqServer("PUT", "/booksTable", data);
 
