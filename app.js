@@ -6,7 +6,7 @@ const mysql = require('./dbcon.js');
 const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
-const PORT = 8636;
+const PORT = 8632;
 
 
 // set up ejs as the view engine
@@ -28,6 +28,19 @@ const selectQuery = selectQ`SELECT * FROM ${tableName}`; // use this for all tab
 const insertBooksQuery = `INSERT INTO Books (book_id, isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?,?);`;
 const insertPatronsQuery = `INSERT INTO Patrons (patron_id, first_name, last_name, address, phone) VALUES (?,?,?,?,?);`;
 
+const insertAuthorsQuery = `INSERT INTO Authors(author_id, first_name, last_name) VALUES(?, ?, ?);`;
+//const updateAuthorsQuery
+//const deleteAuthorsQuery
+
+const insertSectionsQuery = `INSERT INTO Sections(section_id, section_name) VALUES(?, ?);`;
+//const updateSectionsQuery
+//const deleteSectionsQuery
+
+var searchInput;
+const searchBy = `SELECT title, first_name, last_name FROM Books JOIN BookAuthors ON BookAuthors.book_id = Books.book_id JOIN Authors ON Authors.author_id = BookAuthors.author_id WHERE title = ${searchInput};`
+
+
+
 
 function selectQ(tblName){
   // template selectQuery
@@ -41,11 +54,7 @@ function selectQ(tblName){
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-/*
-  FAKE data
-
-*/
-
+/* FAKE DATA */
 
 
 var tempPublishersTable = [
@@ -185,6 +194,29 @@ app.get("/books.html", (req, res)=>{
   // renders the page with the ejs templating using the tempBooks data above
   res.render("pages/books.ejs", {data:tempBook, searchTitle:""});
 });
+
+
+/*SEARCH*/
+
+
+app.get("/search.html", (req, res) => {
+    console.log(searchBy);
+
+    mysql.pool.query(searchBy, (err, rows, fields) => {
+        // get the books table!
+        if (err) {
+            // if there was an error, throw the error
+            console.error(err);
+            res.render("pages/search.ejs", { data: "", error: "Error getting table data" });
+        } else {
+            // else do something with the data
+            console.log(rows);
+            res.render("pages/search.ejs", { data: rows, error: "" });
+        }
+    });
+});
+
+
 
 
 /*
@@ -377,20 +409,64 @@ app.put("/patronsTable", (req,res)=>{
 
 
 app.get("/sectionsTable.html", (req,res)=>{
-  res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
+    // shows all the data in the sections table
+    console.log(selectQ("Sections"));
+    mysql.pool.query(selectQ("Sections"), (err, rows, fields) => {
+        // get the authors table!
+        if (err) {
+            // if there was an error, throw the error
+            console.error(err);
+            res.render("pages/sectionsTable.ejs", { data: "", error: "Error getting table data" });
+        } else {
+            // else do something with the data
+            console.log(rows);
+            res.render("pages/sectionsTable.ejs", { data: rows, error: "" });
+        }
+    });
 });
 
 
 
-app.post("/sectionsTable", (req, res)=>{
-  console.log(req.body);
-  var temp={
-    section_id:req.body.section_id,
-    section_name:req.body.section_name
-  };
-  console.log(tempSectionData)
-  tempSectionData.push(temp);
-  res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
+app.post("/sectionsTable", (req, res) => {
+    // add item to the booksTable
+    console.log("sectionsTable POST", req.body);
+
+    // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
+
+    if (!req.body) {
+        console.error("No req body");
+    } else {
+        var sid = req.body.section_id;
+        var name = req.body.section_name;
+
+        var context = {};
+        // validation of the POST request data.
+        mysql.pool.query(insertSectionsQuery, [sid, name], (err, result) => {
+            if (err) {
+                console.error(err);
+                return;
+            } else {
+                // successfully added new item
+                console.log("success");
+                context.results = "Inserted id " + result.insertId;
+                return;
+            }
+        });
+        // redirect to page to show data.
+        res.redirect("/sectionsTable.html");
+    }
+
+
+
+
+  //console.log(req.body);
+  //var temp={
+  //  section_id:req.body.section_id,
+  //  section_name:req.body.section_name
+  //};
+  //console.log(tempSectionData)
+  //tempSectionData.push(temp);
+  //res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
 });
 
 
@@ -449,22 +525,51 @@ app.put("/publishersTable", (req, res)=>{
 
 */
 
+// Display all data in table
+app.get("/authorsTable.html", (req, res) => {
+    // shows all the data in the books table
+    console.log(selectQ("Authors"));
 
-app.get("/authorsTable.html", (req, res)=>{
-  res.render("pages/authorsTable.ejs", {data:tempAuthorsData, error:""});
+    mysql.pool.query(selectQ("Authors"), (err, rows, fields) => {
+        // get the authors table!
+        if (err) {
+            // if there was an error, throw the error
+            console.error(err);
+            res.render("pages/authorsTable.ejs", { data: "", error: "Error getting table data" });
+        } else {
+            // else do something with the data
+            console.log(rows);
+            res.render("pages/authorsTable.ejs", { data: rows, error: "" });
+        }
+    });
 });
 
 
-app.post("/authorsTable", (req, res)=>{
-  console.log(req.body);
-  var temp = {
-    author_id:removeSpecialCharacters(req.body.author_id),
-    first_name:removeSpecialCharacters(req.body.first_name),
-    last_name:removeSpecialCharacters(req.body.last_name)
-  };
+// Insert new item into table
+app.post("/authorsTable", (req, res) => {
+    if (!req.body) {
+        console.error("No req body");
+    } else {
+        var aid = req.body.section_id;
+        var fn = req.body.first_name;
+        var ln = req.body.last_name
 
-  tempAuthorsData.push(temp);
-  res.render("pages/authorsTable.ejs", {data:tempAuthorsData, error:""});
+        var context = {};
+        // validation of the POST request data.
+        mysql.pool.query(insertAuthorsQuery, [aid, fn, ln], (err, result) => {
+            if (err) {
+                console.error(err);
+                return;
+            } else {
+                // successfully added new item
+                console.log("success");
+                context.results = "Inserted id " + result.insertId;
+                return;
+            }
+        });
+        // redirect to page to show data.
+        res.redirect("/authorsTable.html");
+    }
 });
 
 

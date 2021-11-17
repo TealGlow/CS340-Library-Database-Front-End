@@ -15,7 +15,7 @@
       <label for="last_name">last_name:</label>
       <input type="text" name="last_name" class="form-control">
 
-      <button class="btn btn-dark" type="Submit">Add</button>
+      <button class="btn btn-dark" name="add" type="Submit">Add</button>
       <div class="not-avail" id="data-add-error"></div>
 
     <br/>
@@ -40,10 +40,9 @@
             <td><input type="number" name="author_id" placeholder="<%=data[i].author_id%>" value="<%=data[i].author_id%>"></td>
             <td><input type="text" name="first_name" placeholder="<%=data[i].first_name%>" value ="<%=data[i].first_name%>"> </td>
             <td><input type="text" name="last_name" placeholder="<%=data[i].last_name%>" value ="<%=data[i].last_name%>"> </td>
-
-            <td><button class="btn btn-dark" name="modify" value="<%=data[i].author_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
-          <td><form onsubmit="authorsTableRemoval(<%= data[i].author_id %>)"><button value ="<%= data[i].author_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+            <td><form onsubmit="authorsTableUpdate(<%= data[i].author_id %>)"><button class="btn btn-dark" name="modify" value="<%=data[i].author_id%>" type = "submit" class="btn btn-dark">Modify</button></form></td>
+            <td><form onsubmit="authorsTableRemoval(<%= data[i].author_id %>)"><button value ="<%= data[i].author_id %>" type ="submit" class="btn btn-dark">Delete</button></form></td>
         </tr>
 
       <%}%>

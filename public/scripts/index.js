@@ -368,11 +368,37 @@ const validateFormAuthors = async (i)=>{
 };
 
 
+const authorsTableUpdate = async (i) => {
+    event.preventDefault();
+    
+
+    let rowData = document.getElementsByClassName("row-data");
+    var data = {
+        author_id: "",
+        first_name: "",
+        last_name: ""
+    };
+
+    // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
+
+    console.log(rowData[0][0]);
+
+    //for (var i = 0; i < update[0].length - 1; i++) {
+    //    data[$(update)[0][i].name] = $(update)[0][i].value;
+    //    console.log(data[$(update)[0][i].name]);
+    //}
+
+    // Send request to the DB
+    //reqServer("POST", "/authorsTable", data);
+}
+
 
 const authorsTableRemoval = async (i)=>{
-  event.preventDefault();
-  console.log("Delete", i);
+    event.preventDefault();
+    console.log("Delete ", i);
 };
+
+
 
 
 /*
