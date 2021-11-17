@@ -1,6 +1,8 @@
 const BASE_URL = "http://"+window.location.hostname+":"+window.location.port;
 
 
+
+
 /*
 
   FUNCTIONS FOR FORM VALIDATION ON THE BOOKS TABLE
@@ -82,8 +84,13 @@ const validateFormBooks = async (i)=>{
   data["section_id"] = parseInt(data["section_id"]);
   data["isbn"] = toSubmit[1].value;
   data["publication"] = toSubmit[4].value;
+  console.log("val",toSubmit[7].value);
 
-  console.log(data);
+  if(toSubmit[7].value == "0"){
+    data["on_shelf"] = 0;
+  }else{
+    data["on_shelf"] = 1;
+  }
 
   // after data clean
   reqServer("PUT", "/booksTable", data);
@@ -95,8 +102,10 @@ const validateFormBooks = async (i)=>{
 const booksTableRemoval = async (i)=>{
   // i is going to be the id of the book to remove
   event.preventDefault();
-  console.log("Delete", i);
+  data={id:i};
 
+  console.log(data);
+  reqServer("DELETE", "/booksTable", data);
 };
 
 

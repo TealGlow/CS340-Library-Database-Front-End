@@ -73,12 +73,16 @@
               if(day.length < 2){
                 day = "0"+day;
               }
-              let ymd = String(pub_date.getFullYear())+"-"+month+"-"+day;
+
+              let mdy = String(month)+ "/"+ String(day) +"/"+ String(pub_date.getFullYear());
+
+              console.log(data[i].on_shelf);
+
             %>
-            <td><input type = "date" name="publication" placeholder="<%=ymd%>"> </td>
+            <td><label for="publication"> <%=mdy%> </label><input type = "date" name="publication"> </td>
             <td><input type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" ></td>
             <td><input type="number" name="section_id" placeholder="<%=data[i].section_id%>" ></td>
-            <td><input type ="checkbox" name="on_shelf" placeholder="<%=data[i].on_shelf%>" <%if(data[i].on_shelf == true){%>checked="<%=data[i].on_shelf%>"<%}%>></td>
+            <td><input type ="number" name="on_shelf" placeholder="<%=data[i].on_shelf%>" ></td>
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].book_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
           <td><form onsubmit="booksTableRemoval(<%= data[i].book_id %>)"><button value ="<%= data[i].book_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
