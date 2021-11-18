@@ -1,6 +1,26 @@
 const BASE_URL = "http://"+window.location.hostname+":"+window.location.port;
 
 
+const getSearchInput = async () => {
+    event.preventDefault();
+
+    let temp = document.getElementsByClassName("searchDB");
+    var data = {
+        input: "",
+        type: ""
+    };
+
+    console.log(temp);
+
+    //for (var i = 0; i < temp[0].length - 1; i++) {
+    //    data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
+    //}
+    
+
+};
+
+
+
 /*
 
   FUNCTIONS FOR FORM VALIDATION ON THE BOOKS TABLE

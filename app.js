@@ -23,6 +23,7 @@ app.set('mysql', mysql);
   Queries
 */
 var tableName = "";
+// var titleName = "";
 
 const selectQuery = selectQ`SELECT * FROM ${tableName}`; // use this for all tables
 const insertBooksQuery = `INSERT INTO Books (book_id, isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?,?);`;
@@ -36,19 +37,20 @@ const insertSectionsQuery = `INSERT INTO Sections(section_id, section_name) VALU
 //const updateSectionsQuery
 //const deleteSectionsQuery
 
-var searchInput;
-const searchBy = `SELECT title, first_name, last_name FROM Books JOIN BookAuthors ON BookAuthors.book_id = Books.book_id JOIN Authors ON Authors.author_id = BookAuthors.author_id WHERE title = ${searchInput};`
+// var searchInput = "";
+// const searchByTitle = searchTitleQ`SELECT title, first_name, last_name FROM Books JOIN BookAuthors ON BookAuthors.book_id = Books.book_id JOIN Authors ON Authors.author_id = BookAuthors.author_id;WHERE title = ${titleName};`;
 
 
+function searchTitleQ(title) {
+    console.log("TITLE: ", title);
+    return `SELECT title, first_name, last_name FROM Books JOIN BookAuthors ON BookAuthors.book_id = Books.book_id JOIN Authors ON Authors.author_id = BookAuthors.author_id WHERE title = ${title};`;
+}
 
 
 function selectQ(tblName){
   // template selectQuery
   return  `SELECT * FROM ${tblName};`;
 };
-
-
-
 
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -142,6 +144,11 @@ app.get("/index.html", (req, res)=>{
 });
 
 
+app.post("/index.html", (req, res) => {
+    console.log(req.body);
+});
+
+
 
 
 app.get("/books.html", (req, res)=>{
@@ -194,29 +201,6 @@ app.get("/books.html", (req, res)=>{
   // renders the page with the ejs templating using the tempBooks data above
   res.render("pages/books.ejs", {data:tempBook, searchTitle:""});
 });
-
-
-/*SEARCH*/
-
-
-app.get("/search.html", (req, res) => {
-    console.log(searchBy);
-
-    mysql.pool.query(searchBy, (err, rows, fields) => {
-        // get the books table!
-        if (err) {
-            // if there was an error, throw the error
-            console.error(err);
-            res.render("pages/search.ejs", { data: "", error: "Error getting table data" });
-        } else {
-            // else do something with the data
-            console.log(rows);
-            res.render("pages/search.ejs", { data: rows, error: "" });
-        }
-    });
-});
-
-
 
 
 /*
@@ -653,112 +637,44 @@ app.put("/BookAuthors", (req, res)=>{
 */
 
 
-app.post("/search", (req,res)=>{
-  if(!req.body){
-    // somehow the body has nothing
-    var data={
-      error:"Please enter something!"
+app.post("/search", (req, res) => {
+    if (!req.body) {
+        // somehow the body has nothing
+        var data = {
+            error: "Please enter something!"
+        }
+        res.render("pages/index.ejs", { data: data })
+    } else if (req.body.userInput == "") {
+        // user tries to input nothing
+        var data = {
+            error: "Please enter something!"
+        }
+        res.render("pages/index.ejs", { data: data })
+    } else {
+        
+        // user input something, clean their input and search based on that
+        
+        var table = req.body.search_by;   // Gets table
+        var userInput = '"' + req.body.userInput + '"';
+        console.log(userInput);
+        var data = {
+            searchBy: userInput
+        }
+        var query = searchTitleQ(userInput);
+        console.log(query);
+        mysql.pool.query(query, (err, rows, fields) => {
+            if (err) {
+                // if there was an error, throw the error
+                console.error(err);
+                res.render("pages/search.ejs", { data: "", error: "error getting table data" });
+            } else {
+                // else do something with the data
+                console.log(rows);
+                res.render("pages/search.ejs", { data: rows, error: "" });
+            }
+        });
+    
     }
-    res.render("pages/index.ejs", {data:data})
-  }else if (req.body.userInput == "") {
-    // user tries to input nothing
-    var data={
-      error:"Please enter something!"
-    }
-    res.render("pages/index.ejs", {data:data})
-  }else{
-    // user input something, clean their input and search based on that
-    var searchBy = req.body.search_by;
-    var userInput = removeSpecialCharacters(req.body.userInput);
-    var data={
-      searchBy:userInput
-    }
-
-    /*
-      THIS IS WHERE WE WOULD QUERY THE SEARCH BASED ON USER INPUT
-
-    */
-
-    var fake_book_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:userInput,
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:"Art",
-        authors:[{f_name:"temp1",l_name:"temp2"}],
-        publisher_name:"pub name"
-      }
-    ];
-
-
-    var fake_author_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:"temp book title :)",
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:"Art",
-        authors:[{f_name:userInput,l_name:"temp2"}],
-        publisher_name:"pub name"
-      }
-    ];
-
-
-    var fake_pub_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:"temp book title :)",
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:"Art",
-        authors:[{f_name:"temp2",l_name:"temp2"}],
-        publisher_name:userInput
-      }
-    ];
-
-
-    var fake_section_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:"temp book title :)",
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:userInput,
-        authors:[{f_name:"temp2",l_name:"temp2"}],
-        publisher_name:"Pub :)"
-      }
-    ];
-
-    var fake_data_dict={
-      books:fake_book_data,
-      authors:fake_author_data,
-      publishers:fake_pub_data,
-      sections:fake_section_data
-    };
-
-    var f_data=fake_data_dict[searchBy];
-
-    /*
-      END OF FAKE DATA
-    */
-
-    // render of the page books
-
-    res.render("pages/books.ejs", {data:f_data, searchTitle: userInput});
-  }
 });
 
 
