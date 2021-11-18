@@ -537,7 +537,6 @@ app.post("/publishersTable", (req, res)=>{
 
 
 app.put("/publishersTable", (req, res)=>{
-  console.log("hello",req.body);
 
   if(!req.body){
     return;
@@ -620,7 +619,6 @@ app.put("/authorsTable", (req, res)=>{
   tempAuthorsData["last_name"] = req.body.last_name;
   res.send("got a PUT request");
 });
-
 
 
 
