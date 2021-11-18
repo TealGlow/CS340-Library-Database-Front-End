@@ -42,7 +42,7 @@ const modifyBooksQuery = `UPDATE Books SET book_id=?, isbn=?, title=?, pages=?, 
 const modifyCheckedOutBooks = `UPDATE CheckedOutBooks SET patron_id=?, book_id=? WHERE (patron_id = ? AND Book_id=?);`;
 const modifyBookAuthors = `UPDATE BookAuthors SET author_id=?, book_id=? WHERE(author_id=? AND book_id=?);`;
 const modifyPublishersQuery = `UPDATE Publishers SET publisher_id = ?, company_name=? WHERE publisher_id=?;`;
-
+const modifyPatronsQuery = `UPDATE Patrons SET patron_id = ?, first_name=?, last_name=?, address=?, phone=? WHERE patron_id=?;`;
 
 // search queries
 const searchById = `SELECT * FROM ${tableName} WHERE ${idName}=?`;
@@ -271,15 +271,15 @@ delete
 */
 
 app.delete("/booksTable", (req, res)=>{
-  mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.book_id || req.query.book_id], (err, result)=>{
+  mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.id || req.query.id], (err, result)=>{
     if(err){
       console.error("Error deleting row");
       return;
     }else{
-
+      console.log("to delete",result);
       if(result.length == 1){
         console.log("got this far");
-        mysql.pool.query(setDeleteQuery("Books", "book_id"), [req.body.book_id || req.query.book_id], (err, result)=>{
+        mysql.pool.query(setDeleteQuery("Books", "book_id"), [req.body.id || req.query.id], (err, result)=>{
           if(err){
             console.error("Error deleting");
           }else{
@@ -359,28 +359,63 @@ app.post("/patronsTable", (req, res)=>{
 
 
 app.put("/patronsTable", (req,res)=>{
-  // updates the item if there was a change
   console.log(req.body);
+  if(!req.body){
+    return;
+  }else{
+    mysql.pool.query(setSearchByIdNameAndId("Patrons", "patron_id"),  [req.body.prev_id || req.query.prev_id], (err, rows)=>{
+      console.log("rows",rows);
+      if(!err){
+        // modify query
+        mysql.pool.query(modifyPatronsQuery, [
+              parseInt(req.body.patron_id) || rows[0].patron_id || parseInt(req.query.patron_id),
+              req.body.first_name||req.query.first_name || rows[0].first_name,
+              req.body.last_name || req.query.last_name || rows[0].last_name,
+              req.body.address || req.query.address || rows[0].address,
+              req.body.phone || req.query.phone || rows[0].phone,
+              parseInt(req.body.prev_id)
+            ],
+            (err, result)=>{
+              console.log("here");
+          if(err){
+            console.error("Error updating Patrons");
+            return;
+          }
+          // successfully found and modified row.
+          console.log("success", result);
+          res.send();
+        });
+      }
+    });
 
-  // TODO: if only 1 thing was modified we dont wanna modify the entire table
-  // again right?
-  /*
-  tempPatronsData["patron_id"] = req.body.patron_id;
-  tempPatronsData["first_name"] = req.body.first_name;
-  tempPatronsData["last_name"] = req.body.last_name;
-  tempPatronsData["address"] = req.body.address;
-  tempPatronsData["phone"] = req.body.phone;
-  */
-
-
-
-
-
-
-
-
-  res.send("got a PUT request");
+  }
 });
+
+
+app.delete("/patronsTable", (req, res)=>{
+  // search for the row
+  mysql.pool.query(setSearchByIdNameAndId("Patrons", "patron_id"), [req.body.id || req.query.id], (err, result)=>{
+    if(err){
+      // error finding row
+      console.error("Error deleting row");
+      return;
+    }else{
+      if(result.length == 1){
+        // delete row from the table
+        mysql.pool.query(setDeleteQuery("Patrons", "patron_id"), [req.body.id || req.query.id], (err, result)=>{
+          if(err){
+            console.error("Error deleting");
+          }else{
+            // delete happened
+            console.log("Deleted!");
+            res.send();
+          }
+        });
+      }
+    }
+  });
+});
+
 
 
 /*
@@ -414,6 +449,28 @@ app.put("/sectionsTable", (req, res)=>{
   tempSectionData["section_id"] = req.body.section_id;
   tempSectionData["section_name"] = req.body.section_name;
   res.send("got a PUT request");
+});
+
+
+// check this since the sections table doesnt display yet
+app.delete("/sectionsTable", (req, res)=>{
+  mysql.pool.query(setSearchByIdNameAndId("Sections", "section_id"), [req.body.id || req.query.id], (err, result)=>{
+    if(err){
+      console.error("Error deleting row");
+      return;
+    }else{
+      if(result.length == 1){
+        mysql.pool.query(setDeleteQuery("Sections", "section_id"), [req.body.id || req.query.id], (err, result)=>{
+          if(err){
+            console.error("Error deleting");
+          }else{
+            console.log("Deleted!");
+            res.send();
+          }
+        });
+      }
+    }
+  });
 });
 
 
@@ -505,6 +562,31 @@ app.put("/publishersTable", (req, res)=>{
 
 
 
+app.delete("/publishersTable", (req, res)=>{
+  // search for the row
+  mysql.pool.query(setSearchByIdNameAndId("Publishers", "publisher_id"), [req.body.id || req.query.id], (err, result)=>{
+    if(err){
+      // error finding row
+      console.error("Error deleting row");
+      return;
+    }else{
+      if(result.length == 1){
+        // delete row from the table
+        mysql.pool.query(setDeleteQuery("Publishers", "publisher_id"), [req.body.id || req.query.id], (err, result)=>{
+          if(err){
+            console.error("Error deleting");
+          }else{
+            // delete happened
+            console.log("Deleted!");
+            res.send();
+          }
+        });
+      }
+    }
+  });
+});
+
+
 /*
 
   FUNCTIONS TO HANDLE THE AUTHORS TABLE.
@@ -541,6 +623,30 @@ app.put("/authorsTable", (req, res)=>{
 
 
 
+
+app.delete("/authorsTable", (req, res)=>{
+  // search for the row
+  mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"), [req.body.id || req.query.id], (err, result)=>{
+    if(err){
+      // error finding row
+      console.error("Error deleting row");
+      return;
+    }else{
+      if(result.length == 1){
+        // delete row from the table
+        mysql.pool.query(setDeleteQuery("Authors", "author_id"), [req.body.id || req.query.id], (err, result)=>{
+          if(err){
+            console.error("Error deleting");
+          }else{
+            // delete happened
+            console.log("Deleted!");
+            res.send();
+          }
+        });
+      }
+    }
+  });
+});
 
 
 /*
