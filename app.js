@@ -42,8 +42,38 @@ const insertSectionsQuery = `INSERT INTO Sections(section_id, section_name) VALU
 
 
 function searchTitleQ(title) {
-    console.log("TITLE: ", title);
-    return `SELECT title, first_name, last_name FROM Books JOIN BookAuthors ON BookAuthors.book_id = Books.book_id JOIN Authors ON Authors.author_id = BookAuthors.author_id WHERE title = ${title};`;
+    console.log(title);
+    return `SELECT title, first_name, last_name 
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            WHERE title = ${title};`;
+}
+
+function searchAuthorQ(author) {
+    return `SELECT title, first_name, last_name, on_shelf
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            WHERE CONCAT(first_name, " ", last_name) = ${author};`;
+}
+
+function searchPublisherQ(publisher) {
+    return `SELECT title, first_name, last_name, on_shelf
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            JOIN Publishers ON Publishers.publisher_id = Books.publisher_id
+            WHERE company_name = ${publisher};`;
+}
+
+function searchSectionQ(section) {
+    return `SELECT title, first_name, last_name, on_shelf
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            JOIN Sections ON Sections.section_id = Books.section_id
+            WHERE section_name = ${section};`;
 }
 
 
@@ -652,23 +682,29 @@ app.post("/search", (req, res) => {
         res.render("pages/index.ejs", { data: data })
     } else {
         
-        // user input something, clean their input and search based on that
-        
-        var table = req.body.search_by;   // Gets table
-        var userInput = '"' + req.body.userInput + '"';
+        var table = req.body.search_by;                     // Gets table from dropdown
+        var userInput = "'" + req.body.userInput + "'";     // Gets user input from search bar
         console.log(userInput);
         var data = {
             searchBy: userInput
         }
-        var query = searchTitleQ(userInput);
+        var query = "";
+
+        if (table == "Books") {
+            query = searchTitleQ(userInput);
+        } else if (table == "Authors") {
+            query = searchAuthorQ(userInput);
+        } else if (table == "Publishers") {
+            query = searchPublisherQ(userInput);
+        } else if (table == "Sections") {
+            query = searchSectionQ(userInput);
+        }
         console.log(query);
         mysql.pool.query(query, (err, rows, fields) => {
             if (err) {
-                // if there was an error, throw the error
                 console.error(err);
                 res.render("pages/search.ejs", { data: "", error: "error getting table data" });
             } else {
-                // else do something with the data
                 console.log(rows);
                 res.render("pages/search.ejs", { data: rows, error: "" });
             }
