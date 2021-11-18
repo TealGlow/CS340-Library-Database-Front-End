@@ -1,6 +1,12 @@
 const BASE_URL = "http://"+window.location.hostname+":"+window.location.port;
 
 
+window.onload =  ()=>{
+  document.getElementsByClassName("user-input").value="";
+};
+
+
+
 /*
 
   FUNCTIONS FOR FORM VALIDATION ON THE BOOKS TABLE
@@ -16,7 +22,9 @@ const addAndValidateFormBooks = async ()=>{
     // TO DO: DONT LET USER ENTER INCORRECT DATA
 
     console.log(BASE_URL);
-    let temp = document.getElementsByClassName("addData");
+
+    let temp = document.getElementsByClassName("form-control");
+    console.log(temp);
     var data={
       book_id:"",
       isbn:"",
@@ -28,14 +36,27 @@ const addAndValidateFormBooks = async ()=>{
       on_shelf:""
     };
 
-    console.log(temp);
+    console.log("temp",temp);
 
     // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
 
-    for(var i=0; i<temp[0].length-1; i++){
-      data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
+    for(var i=0; i<temp.length; i++){
+      data[temp[i].name] = await cleanData(temp[i].value);
     }
-    data["publication"] = new Date($(temp)[0][4].value);
+    data["publication"] = new Date(temp[4].value);
+    data["book_id"] = parseInt(data["book_id"]);
+    data["section_id"] = parseInt(data["section_id"]);
+    data["publisher_id"] = parseInt(data["publisher_id"]);
+    //data["isbn"] = parseInt(data["isbn"]);
+    data["pages"] = parseInt(data["pages"]);
+
+    if(data["on_shelf"] == "0"){
+      data["on_shelf"]=0;
+    }else{
+      data["on_shelf"]=1;
+    }
+
+    console.log(data);
 
     if(data["book_id"] == "" || data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == "" || data["on_shelf"] == ""){
       console.log("Error please enter all data fields!");
@@ -82,8 +103,13 @@ const validateFormBooks = async (i)=>{
   data["section_id"] = parseInt(data["section_id"]);
   data["isbn"] = toSubmit[1].value;
   data["publication"] = toSubmit[4].value;
+  console.log("val",toSubmit[7].value);
 
-  console.log(data);
+  if(toSubmit[7].value == "0"){
+    data["on_shelf"] = 0;
+  }else{
+    data["on_shelf"] = 1;
+  }
 
   // after data clean
   reqServer("PUT", "/booksTable", data);
@@ -95,8 +121,9 @@ const validateFormBooks = async (i)=>{
 const booksTableRemoval = async (i)=>{
   // i is going to be the id of the book to remove
   event.preventDefault();
-  console.log("Delete", i);
+  data={id:i};
 
+  reqServer("DELETE", "/booksTable", data);
 };
 
 
@@ -141,8 +168,10 @@ const validateFormSections = async (i)=>{
   var data={
     "section_id":"",
     "section_name":"",
-    "prev_id":i
+    "prev_id":parseInt(toSubmit[toSubmit.length-1].value)
   };
+
+
 
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
@@ -155,7 +184,10 @@ const validateFormSections = async (i)=>{
 
 const sectionsTableRemoval = async (i)=>{
   event.preventDefault();
+  data={id:i}
+
   console.log("Delete", i);
+  reqServer("DELETE", "/sectionsTable", data);
 };
 
 
@@ -219,16 +251,19 @@ const validateFormPatrons = async (i)=>{
     "last_name":"",
     "address":"",
     "phone":"",
-    "prev_id":i
+    "prev_id":parseInt(toSubmit[toSubmit.length-1].value)
   };
+
 
 
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
 
-  data["address"] = $(toSubmit)[0][3];
-  data["phone"] = $(toSubmit)[0][4];
+  data["address"] = $(toSubmit)[0][3].value;
+  data["phone"] = $(toSubmit)[0][4].value;
+
+  console.log(data);
   // after data clean
   reqServer("PUT", "/patronsTable", data);
 };
@@ -237,7 +272,9 @@ const validateFormPatrons = async (i)=>{
 
 const patronsTableRemoval = async(i)=>{
   event.preventDefault();
-  console.log("Delete", i);
+  data={id:i}
+
+  reqServer("DELETE", "/patronsTable", data);
 };
 
 
@@ -264,8 +301,6 @@ const addAndValidateFormPublishers = async ()=>{
   };
 
   console.log(temp);
-
-  // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
 
   for(var i=0; i<temp[0].length-1; i++){
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
@@ -313,7 +348,10 @@ const validateFormPublishers = async (i)=>{
 
 const publishersTableRemoval = async (i)=>{
   event.preventDefault();
-  console.log("Delete", i);
+  data={id:i}
+
+  console.log
+  reqServer("DELETE", "/publishersTable", data);
 };
 
 
@@ -388,7 +426,9 @@ const validateFormAuthors = async (i)=>{
 
 const authorsTableRemoval = async (i)=>{
   event.preventDefault();
-  console.log("Delete", i);
+  data={id:i}
+
+  reqServer("DELETE", "/patronsTable", data);
 };
 
 
