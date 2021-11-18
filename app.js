@@ -192,14 +192,14 @@ app.post("/booksTable", (req, res)=>{
 
     console.log(parseInt(req.body.on_shelf));
 
-    var bid = removeSpecialCharacters(req.body.book_id);
-    var isb = removeSpecialCharacters(req.body.isbn);
-    var ti = removeSpecialCharacters(req.body.title);
-    var pa = removeSpecialCharacters(req.body.pages);
+    var bid = req.body.book_id;
+    var isb = req.body.isbn;
+    var ti = req.body.title;
+    var pa = req.body.pages;
     var pub = req.body.publication;
-    var pid = removeSpecialCharacters(req.body.publisher_id);
-    var sid = removeSpecialCharacters(req.body.section_id);
-    var ons = parseInt(req.body.on_shelf);
+    var pid = req.body.publisher_id;
+    var sid = req.body.section_id;
+    var ons = req.body.on_shelf;
 
     var context={};
     // validation of the POST request data.
