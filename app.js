@@ -55,7 +55,7 @@ const modifyPatronsQuery = `UPDATE Patrons SET patron_id = ?, first_name=?, last
 
 function searchTitleQ(title) {
     console.log(title);
-    return `SELECT title, first_name, last_name 
+    return `SELECT title, first_name, last_name
             FROM Books
             JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
             JOIN Authors ON Authors.author_id = BookAuthors.author_id
@@ -312,9 +312,9 @@ app.put("/booksTable", (req,res)=>{
           req.body.title || req.query.title || tempCurrentValues.title,
           req.body.pages || req.query.pages || tempCurrentValues.pages,
           req.body.publication || req.query.publication || tempCurrentValues.publication,
-          req.body.publisher_id || req.query.publisher_id || tempCurrentValues.publisher_id,
-          req.body.section_id || req.query.section_id || tempCurrentValues.section_id,
-          req.body.on_shelf || req.query.on_shelf,
+          parseInt(req.body.publisher_id) || parseInt(req.query.publisher_id) || parseInt(tempCurrentValues.publisher_id),
+          parseInt(req.body.section_id) || parseInt(req.query.section_id) || parseInt(tempCurrentValues.section_id),
+          parseInt(req.body.on_shelf) /*|| parseInt(req.query.on_shelf)*/,
           req.body.prev_id || req.query.prev_id], (err, result)=>{
           // update here
           if(err){
@@ -972,7 +972,7 @@ app.post("/search", (req, res) => {
         }
         res.render("pages/index.ejs", { data: data })
     } else {
-        
+
         var table = req.body.search_by;                     // Gets table from dropdown
         var userInput = "'" + req.body.userInput + "'";     // Gets user input from search bar
         console.log(userInput);
@@ -1000,7 +1000,7 @@ app.post("/search", (req, res) => {
                 res.render("pages/search.ejs", { data: rows, error: "" });
             }
         });
-    
+
     }
 });
 

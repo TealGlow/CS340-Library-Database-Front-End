@@ -16,7 +16,7 @@ const getSearchInput = async () => {
     //for (var i = 0; i < temp[0].length - 1; i++) {
     //    data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
     //}
-};  
+};
 
 
 window.onload =  ()=>{
@@ -119,7 +119,6 @@ const validateFormBooks = async (i)=>{
   data["section_id"] = parseInt(data["section_id"]);
   data["isbn"] = toSubmit[1].value;
   data["publication"] = toSubmit[4].value;
-  console.log("val",toSubmit[7].value);
 
   if(toSubmit[7].value == "0"){
     data["on_shelf"] = 0;
@@ -441,7 +440,7 @@ const validateFormAuthors = async (i)=>{
 
 const authorsTableUpdate = async (i) => {
     event.preventDefault();
-    
+
 
     let rowData = document.getElementsByClassName("row-data");
     var data = {
