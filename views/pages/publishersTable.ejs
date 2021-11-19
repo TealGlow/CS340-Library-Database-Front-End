@@ -14,7 +14,7 @@
 
       <button class="btn btn-dark" type="Submit">Add</button>
       <div class="not-avail" id="data-add-error"></div>
-        
+
     <br/>
     <br/>
 
@@ -32,9 +32,9 @@
       <% for(var i = 0; i<data.length; i++){%>
 
         <tr>
-          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormPublishers(<%=data[i].publisher_id%>)">
-            <td><input type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" value="<%=data[i].publisher_id%>"></td>
-            <td><input type="text" name="company_name" placeholder="<%=data[i].company_name%>" value ="<%=data[i].company_name%>"> </td>
+          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormPublishers(<%=i%>)">
+            <td><input type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" ></td>
+            <td><input type="text" name="company_name" placeholder="<%=data[i].company_name%>" > </td>
 
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].publisher_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>

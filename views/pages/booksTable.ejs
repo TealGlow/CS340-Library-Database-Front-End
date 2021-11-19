@@ -28,7 +28,7 @@
       <input type="number" name="section_id" class="form-control">
 
       <label >on_shelf:</label>
-      <input type ="checkbox" name="on_shelf">
+      <input type ="number" name="on_shelf" class="form-control">
 
       <button class="btn btn-dark" type="Submit">Add</button>
       <div class="not-avail" id="data-add-error"></div>
@@ -55,15 +55,15 @@
       <% for(var i = 0; i<data.length; i++){%>
 
         <tr>
-          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormBooks(<%=data[i].book_id%>)">
-            <td><input type="number" name="book_id" placeholder="<%=data[i].book_id%>" value="<%=data[i].book_id%>"></td>
-            <td><input type="number" name="isbn" placeholder="<%=data[i].isbn%>" value ="<%=data[i].isbn%>"> </td>
-            <td><input name="title" placeholder="<%=data[i].title%>" value ="<%=data[i].title%>"> </td>
-            <td><input type="number" name="pages" placeholder="<%=data[i].pages%>" value ="<%=data[i].pages%>"> </td>
+          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormBooks(<%=i%>)">
+            <td><input type="number" name="book_id" placeholder="<%=data[i].book_id%>"></td>
+            <td><input type="number" name="isbn" placeholder="<%=data[i].isbn%>" > </td>
+            <td><input name="title" placeholder="<%=data[i].title%>" > </td>
+            <td><input type="number" name="pages" placeholder="<%=data[i].pages%>" > </td>
             <%
               //formatting the date for the publication date.
               let pub_date = new Date(data[i].publication);
-  
+
               let month = String(pub_date.getMonth());
               month = String(parseInt(month)+1);
               if(month.length < 2){
@@ -73,12 +73,16 @@
               if(day.length < 2){
                 day = "0"+day;
               }
-              let ymd = String(pub_date.getFullYear())+"-"+month+"-"+day;
+
+              let mdy = String(month)+ "/"+ String(day) +"/"+ String(pub_date.getFullYear());
+
+              console.log(data[i].on_shelf);
+
             %>
-            <td><input type = "date" name="publication" placeholder="<%=ymd%>" value ="<%=ymd%>"> </td>
-            <td><input type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" value ="<%=data[i].publisher_id%>"></td>
-            <td><input type="number" name="section_id" placeholder="<%=data[i].section_id%>" value ="<%=data[i].section_id%>"></td>
-            <td><input type ="checkbox" name="on_shelf" placeholder="<%=data[i].on_shelf%>" <%if(data[i].on_shelf == true){%>checked="<%=data[i].on_shelf%>"<%}%> value ="<%=data[i].on_shelf%>"></td>
+            <td><label for="publication"> <%=mdy%> </label><input type = "date" name="publication"> </td>
+            <td><input type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" ></td>
+            <td><input type="number" name="section_id" placeholder="<%=data[i].section_id%>" ></td>
+            <td><input type ="number" name="on_shelf" placeholder="<%=data[i].on_shelf%>" ></td>
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].book_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
           <td><form onsubmit="booksTableRemoval(<%= data[i].book_id %>)"><button value ="<%= data[i].book_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>

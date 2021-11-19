@@ -22,7 +22,7 @@
 
       <button class="btn btn-dark" type="Submit">Add</button>
       <div class="not-avail" id="data-add-error"></div>
-        
+
     <br/>
     <br/>
 
@@ -42,12 +42,12 @@
       <% for(var i = 0; i<data.length; i++){%>
 
         <tr>
-          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormPatrons(<%=data[i].patron_id%>)">
-            <td><input type="number" name="patron_id" placeholder="<%=data[i].patron_id%>" value="<%=data[i].patron_id%>"></td>
-            <td><input type="text" name="first_name" placeholder="<%=data[i].first_name%>" value ="<%=data[i].first_name%>"> </td>
-            <td><input type = "text" name="last_name" placeholder="<%=data[i].last_name%>" value ="<%=data[i].last_name%>"> </td>
-            <td><input type="address" name="address" placeholder="<%=data[i].address%>" value ="<%=data[i].address%>"> </td>
-            <td><input type = "tel" name="phone" placeholder="<%=data[i].phone%>" value ="<%=data[i].phone%>"> </td>
+          <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormPatrons(<%=i%>)">
+            <td><input class="user-input" type="number" name="patron_id" placeholder="<%=data[i].patron_id%>" ></td>
+            <td><input class="user-input" type="text" name="first_name" placeholder="<%=data[i].first_name%>"> </td>
+            <td><input class="user-input" type = "text" name="last_name" placeholder="<%=data[i].last_name%>"> </td>
+            <td><input class="user-input" type="address" name="address" placeholder="<%=data[i].address%>"> </td>
+            <td><input class="user-input" type = "tel" name="phone" placeholder="<%=data[i].phone%>"> </td>
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].patron_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
           <td><form onsubmit="patronsTableRemoval(<%= data[i].patron_id %>)"><button value ="<%= data[i].patron_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
