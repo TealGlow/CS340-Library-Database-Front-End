@@ -201,6 +201,7 @@ app.post("/booksTable", (req, res)=>{
     var sid = req.body.section_id;
     var ons = req.body.on_shelf;
 
+    console.log("ONS", ons);
     var context={};
     // validation of the POST request data.
     mysql.pool.query(insertBooksQuery, [bid, isb, ti, pa, pub, pid, sid, ons], (err, result)=>{

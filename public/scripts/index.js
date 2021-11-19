@@ -47,7 +47,6 @@ const addAndValidateFormBooks = async ()=>{
     data["book_id"] = parseInt(data["book_id"]);
     data["section_id"] = parseInt(data["section_id"]);
     data["publisher_id"] = parseInt(data["publisher_id"]);
-    //data["isbn"] = parseInt(data["isbn"]);
     data["pages"] = parseInt(data["pages"]);
 
     if(data["on_shelf"] == "0"){
@@ -56,9 +55,7 @@ const addAndValidateFormBooks = async ()=>{
       data["on_shelf"]=1;
     }
 
-    console.log(data);
-
-    if(data["book_id"] == "" || data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == "" || data["on_shelf"] == ""){
+    if(data["book_id"] == "" || data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == ""){
       console.log("Error please enter all data fields!");
       document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
     }else{
