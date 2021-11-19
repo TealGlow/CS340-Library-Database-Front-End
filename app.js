@@ -6,12 +6,13 @@ const mysql = require('./dbcon.js');
 const app = express();
 
 // IMPORTANT: change the port to whatever works the best on the flip server.
-const PORT = 8636;
+const PORT = 8632;
 
 
 // set up ejs as the view engine
 app.set('view engine', 'ejs');
 app.use(express.static("public"));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.json());
 
 /*
@@ -25,6 +26,7 @@ app.set('mysql', mysql);
 var tableName = "";
 var idName="";
 
+
 // select query
 const selectQuery = selectQ`SELECT * FROM ${tableName}`; // use this for all tables
 
@@ -32,10 +34,16 @@ const selectQuery = selectQ`SELECT * FROM ${tableName}`; // use this for all tab
 const insertBooksQuery = `INSERT INTO Books (book_id, isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?,?);`;
 const insertPatronsQuery = `INSERT INTO Patrons (patron_id, first_name, last_name, address, phone) VALUES (?,?,?,?,?);`;
 
+
+const insertAuthorsQuery = `INSERT INTO Authors(author_id, first_name, last_name) VALUES(?, ?, ?);`;
+const insertSectionsQuery = `INSERT INTO Sections(section_id, section_name) VALUES(?, ?);`;
 const insertPublishersQuery = `INSERT INTO Publishers (publisher_id, company_name) VALUES (?,?);`;
 const insertCheckedOutBooksQuery = `INSERT INTO CheckedOutBooks(patron_id, book_id) VALUES (?,?);`;
 const insertBookAuthorQuery =  `INSERT INTO BookAuthors(author_id, book_id) VALUES(?,?);`;
 
+
+// var searchInput = "";
+// const searchByTitle = searchTitleQ`SELECT title, first_name, last_name FROM Books JOIN BookAuthors ON BookAuthors.book_id = Books.book_id JOIN Authors ON Authors.author_id = BookAuthors.author_id;WHERE title = ${titleName};`;
 
 // update queries
 const modifyBooksQuery = `UPDATE Books SET book_id=?, isbn=?, title=?, pages=?, publication=?, publisher_id=?, section_id=?, on_shelf=? WHERE book_id=?`;
@@ -44,20 +52,74 @@ const modifyBookAuthors = `UPDATE BookAuthors SET author_id=?, book_id=? WHERE(a
 const modifyPublishersQuery = `UPDATE Publishers SET publisher_id = ?, company_name=? WHERE publisher_id=?;`;
 const modifyPatronsQuery = `UPDATE Patrons SET patron_id = ?, first_name=?, last_name=?, address=?, phone=? WHERE patron_id=?;`;
 
+
+function searchTitleQ(title) {
+    console.log(title);
+    return `SELECT title, first_name, last_name 
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            WHERE title = ${title};`;
+}
+
 // search queries
 const searchById = `SELECT * FROM ${tableName} WHERE ${idName}=?`;
 const searchCheckedOutBooks = `SELECT * FROM CheckedOutBooks WHERE patron_id=? AND book_id=?;`;
 const searchBookAuthors = `SELECT * FROM BookAuthors WHERE author_id=? AND book_id=?;`;
 
 
+function searchAuthorQ(author) {
+    return `SELECT title, first_name, last_name, on_shelf
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            WHERE CONCAT(first_name, " ", last_name) = ${author};`;
+}
+
+
+function searchPublisherQ(publisher) {
+    return `SELECT title, first_name, last_name, on_shelf
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            JOIN Publishers ON Publishers.publisher_id = Books.publisher_id
+            WHERE company_name = ${publisher};`;
+}
+
 // delete Queries
 const deleteQuery = `DELETE FROM ${tableName} WHERE book_id=${idName};`;
+
+
+function searchSectionQ(section) {
+    return `SELECT title, first_name, last_name, on_shelf
+            FROM Books
+            JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
+            JOIN Authors ON Authors.author_id = BookAuthors.author_id
+            JOIN Sections ON Sections.section_id = Books.section_id
+            WHERE section_name = ${section};`;
+}
 
 
 function selectQ(tblName){
   // template selectQuery
   return  `SELECT * FROM ${tblName};`;
 };
+
+
+/* FAKE DATA */
+
+
+var tempPublishersTable = [
+  {
+    publisher_id:0,
+    company_name:"Temp Name 1"
+  },
+  {
+    publisher_id:1,
+    company_name:"Temp Name 2"
+  }
+];
+
 
 
 function setSearchByIdNameAndId(tblName, idName){
@@ -70,8 +132,6 @@ function setDeleteQuery(tblName, idName){
   return `DELETE FROM ${tblName} WHERE ${idName}=?;`;
 };
 
-
-app.use(bodyParser.urlencoded({extended: true}));
 
 
 
@@ -98,6 +158,11 @@ app.get("/index.html", (req, res)=>{
     error:""
   }
   res.render("pages/index.ejs", {data:data});
+});
+
+
+app.post("/index.html", (req, res) => {
+    console.log(req.body);
 });
 
 
@@ -426,20 +491,64 @@ app.delete("/patronsTable", (req, res)=>{
 
 
 app.get("/sectionsTable.html", (req,res)=>{
-  res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
+    // shows all the data in the sections table
+    console.log(selectQ("Sections"));
+    mysql.pool.query(selectQ("Sections"), (err, rows, fields) => {
+        // get the authors table!
+        if (err) {
+            // if there was an error, throw the error
+            console.error(err);
+            res.render("pages/sectionsTable.ejs", { data: "", error: "Error getting table data" });
+        } else {
+            // else do something with the data
+            console.log(rows);
+            res.render("pages/sectionsTable.ejs", { data: rows, error: "" });
+        }
+    });
 });
 
 
 
-app.post("/sectionsTable", (req, res)=>{
-  console.log(req.body);
-  var temp={
-    section_id:req.body.section_id,
-    section_name:req.body.section_name
-  };
-  console.log(tempSectionData)
-  tempSectionData.push(temp);
-  res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
+app.post("/sectionsTable", (req, res) => {
+    // add item to the booksTable
+    console.log("sectionsTable POST", req.body);
+
+    // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
+
+    if (!req.body) {
+        console.error("No req body");
+    } else {
+        var sid = req.body.section_id;
+        var name = req.body.section_name;
+
+        var context = {};
+        // validation of the POST request data.
+        mysql.pool.query(insertSectionsQuery, [sid, name], (err, result) => {
+            if (err) {
+                console.error(err);
+                return;
+            } else {
+                // successfully added new item
+                console.log("success");
+                context.results = "Inserted id " + result.insertId;
+                return;
+            }
+        });
+        // redirect to page to show data.
+        res.redirect("/sectionsTable.html");
+    }
+
+
+
+
+  //console.log(req.body);
+  //var temp={
+  //  section_id:req.body.section_id,
+  //  section_name:req.body.section_name
+  //};
+  //console.log(tempSectionData)
+  //tempSectionData.push(temp);
+  //res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
 });
 
 
@@ -593,23 +702,52 @@ app.delete("/publishersTable", (req, res)=>{
 
 */
 
+// Display all data in table
+app.get("/authorsTable.html", (req, res) => {
+    // shows all the data in the books table
+    console.log(selectQ("Authors"));
 
-app.get("/authorsTable.html", (req, res)=>{
-  res.render("pages/authorsTable.ejs", {data:tempAuthorsData, error:""});
+    mysql.pool.query(selectQ("Authors"), (err, rows, fields) => {
+        // get the authors table!
+        if (err) {
+            // if there was an error, throw the error
+            console.error(err);
+            res.render("pages/authorsTable.ejs", { data: "", error: "Error getting table data" });
+        } else {
+            // else do something with the data
+            console.log(rows);
+            res.render("pages/authorsTable.ejs", { data: rows, error: "" });
+        }
+    });
 });
 
 
 
-app.post("/authorsTable", (req, res)=>{
-  console.log(req.body);
-  var temp = {
-    author_id:removeSpecialCharacters(req.body.author_id),
-    first_name:removeSpecialCharacters(req.body.first_name),
-    last_name:removeSpecialCharacters(req.body.last_name)
-  };
+// Insert new item into table
+app.post("/authorsTable", (req, res) => {
+    if (!req.body) {
+        console.error("No req body");
+    } else {
+        var aid = req.body.section_id;
+        var fn = req.body.first_name;
+        var ln = req.body.last_name
 
-  tempAuthorsData.push(temp);
-  res.render("pages/authorsTable.ejs", {data:tempAuthorsData, error:""});
+        var context = {};
+        // validation of the POST request data.
+        mysql.pool.query(insertAuthorsQuery, [aid, fn, ln], (err, result) => {
+            if (err) {
+                console.error(err);
+                return;
+            } else {
+                // successfully added new item
+                console.log("success");
+                context.results = "Inserted id " + result.insertId;
+                return;
+            }
+        });
+        // redirect to page to show data.
+        res.redirect("/authorsTable.html");
+    }
 });
 
 
@@ -653,8 +791,6 @@ app.delete("/authorsTable", (req, res)=>{
 */
 
 app.get("/CheckedOutBooks.html", (req, res)=>{
-  console.log(selectQ("CheckedOutBooks"));
-
 
   mysql.pool.query(selectQ("CheckedOutBooks"), (err, rows, fields)=>{
     // get the books authors table!
@@ -664,7 +800,6 @@ app.get("/CheckedOutBooks.html", (req, res)=>{
       res.render("pages/CheckedOutBooks.ejs", {data:"", error:"Error getting table data"});
     }else{
       // else do something with the data
-      console.log(rows);
       res.render("pages/CheckedOutBooks.ejs", {data:rows, error:""});
     }
   });
@@ -706,7 +841,6 @@ app.post("/CheckedOutBooks", (req, res)=>{
 
 app.put("/CheckedOutBooks", (req, res)=>{
   // updates the item if there was a change
-  console.log("hello",req.body);
 
   if(!req.body){
     return;
@@ -824,112 +958,50 @@ app.put("/BookAuthors", (req, res)=>{
 */
 
 
-app.post("/search", (req,res)=>{
-  if(!req.body){
-    // somehow the body has nothing
-    var data={
-      error:"Please enter something!"
+app.post("/search", (req, res) => {
+    if (!req.body) {
+        // somehow the body has nothing
+        var data = {
+            error: "Please enter something!"
+        }
+        res.render("pages/index.ejs", { data: data })
+    } else if (req.body.userInput == "") {
+        // user tries to input nothing
+        var data = {
+            error: "Please enter something!"
+        }
+        res.render("pages/index.ejs", { data: data })
+    } else {
+        
+        var table = req.body.search_by;                     // Gets table from dropdown
+        var userInput = "'" + req.body.userInput + "'";     // Gets user input from search bar
+        console.log(userInput);
+        var data = {
+            searchBy: userInput
+        }
+        var query = "";
+
+        if (table == "Books") {
+            query = searchTitleQ(userInput);
+        } else if (table == "Authors") {
+            query = searchAuthorQ(userInput);
+        } else if (table == "Publishers") {
+            query = searchPublisherQ(userInput);
+        } else if (table == "Sections") {
+            query = searchSectionQ(userInput);
+        }
+        console.log(query);
+        mysql.pool.query(query, (err, rows, fields) => {
+            if (err) {
+                console.error(err);
+                res.render("pages/search.ejs", { data: "", error: "error getting table data" });
+            } else {
+                console.log(rows);
+                res.render("pages/search.ejs", { data: rows, error: "" });
+            }
+        });
+    
     }
-    res.render("pages/index.ejs", {data:data})
-  }else if (req.body.userInput == "") {
-    // user tries to input nothing
-    var data={
-      error:"Please enter something!"
-    }
-    res.render("pages/index.ejs", {data:data})
-  }else{
-    // user input something, clean their input and search based on that
-    var searchBy = req.body.search_by;
-    var userInput = removeSpecialCharacters(req.body.userInput);
-    var data={
-      searchBy:userInput
-    }
-
-    /*
-      THIS IS WHERE WE WOULD QUERY THE SEARCH BASED ON USER INPUT
-
-    */
-
-    var fake_book_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:userInput,
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:"Art",
-        authors:[{f_name:"temp1",l_name:"temp2"}],
-        publisher_name:"pub name"
-      }
-    ];
-
-
-    var fake_author_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:"temp book title :)",
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:"Art",
-        authors:[{f_name:userInput,l_name:"temp2"}],
-        publisher_name:"pub name"
-      }
-    ];
-
-
-    var fake_pub_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:"temp book title :)",
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:"Art",
-        authors:[{f_name:"temp2",l_name:"temp2"}],
-        publisher_name:userInput
-      }
-    ];
-
-
-    var fake_section_data=[
-      {
-        book_id:1,
-        isbn:0000000,
-        title:"temp book title :)",
-        pages:300,
-        publication:new Date(),
-        publisher_id:1,
-        on_shelf:true,
-        section_name:userInput,
-        authors:[{f_name:"temp2",l_name:"temp2"}],
-        publisher_name:"Pub :)"
-      }
-    ];
-
-    var fake_data_dict={
-      books:fake_book_data,
-      authors:fake_author_data,
-      publishers:fake_pub_data,
-      sections:fake_section_data
-    };
-
-    var f_data=fake_data_dict[searchBy];
-
-    /*
-      END OF FAKE DATA
-    */
-
-    // render of the page books
-
-    res.render("pages/books.ejs", {data:f_data, searchTitle: userInput});
-  }
 });
 
 
