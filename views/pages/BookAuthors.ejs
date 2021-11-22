@@ -41,7 +41,7 @@
 
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].author_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
-          <td><form onsubmit="bookAuthorsTableRemoval(<%= data[i].author_id %>)"><button value ="<%= data[i].author_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+          <td><form onsubmit="bookAuthorsTableRemoval(<%= data[i].author_id %>, <%= data[i].book_id %>)"><button value ="<%= data[i].author_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
         </tr>
 
       <%}%>

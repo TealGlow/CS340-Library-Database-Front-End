@@ -6,8 +6,8 @@
   <!-- form to add data -->
   <div class="form-container center">
     <form class="addData element-col" onSubmit="addAndValidateFormSections()">
-      <label for="section_id">Section_id:</label>
-      <input type="number" name="section_id" class="form-control">
+      <!--<label for="section_id">Section_id:</label>
+      <input type="number" name="section_id" class="form-control">-->
 
       <label>Section_name:</label>
       <input type="text" name="section_name" class="form-control">
@@ -31,9 +31,9 @@
 
       <tr>
         <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormSections(<%=i%>)">
-          <td><input type="number" name="section_id" placeholder="<%=data[i].section_id%>"> </td>
+          <td style="text-align:center"><strong><%=data[i].section_id%></strong></td>
           <td><input type="text" name="section_name" placeholder="<%=data[i].section_name%>" > </td>
-          <td><button class="btn btn-dark" name="modify" value="<%=i%>" type = "submit" class="btn btn-dark">Modify</button></td>
+          <td><button class="btn btn-dark" name="modify" value="<%= data[i].section_id %>" type = "submit" class="btn btn-dark">Modify</button></td>
         </form>
         <td><form onsubmit="sectionsTableRemoval(<%= data[i].section_id %>)"><button value ="<%= data[i].section_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
       </tr>

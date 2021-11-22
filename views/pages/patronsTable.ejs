@@ -6,8 +6,8 @@
     <!-- form to add data -->
     <div class="form-container center">
       <form class="addData element-col" onSubmit="addAndValidateFormPatrons()">
-        <label for="patron_id">patron_id:</label>
-        <input type="number" name="patron_id" class="form-control">
+        <!--<label for="patron_id">patron_id:</label>
+        <input type="number" name="patron_id" class="form-control">-->
 
         <label>first_name:</label>
         <input type="text" name="first_name" class="form-control">
@@ -45,7 +45,8 @@
 
         <tr>
           <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormPatrons(<%=i%>)">
-            <td><input class="user-input" type="number" name="patron_id" placeholder="<%=data[i].patron_id%>" ></td>
+            <!--<td><input class="user-input" type="number" name="patron_id" placeholder="<%=data[i].patron_id%>" ></td>-->
+            <td style="text-align:center"><strong><%=data[i].patron_id%></strong></td>
             <td><input class="user-input" type="text" name="first_name" placeholder="<%=data[i].first_name%>"> </td>
             <td><input class="user-input" type = "text" name="last_name" placeholder="<%=data[i].last_name%>"> </td>
             <td><input class="user-input" type="address" name="address" placeholder="<%=data[i].address%>"> </td>

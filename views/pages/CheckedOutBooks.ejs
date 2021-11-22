@@ -40,7 +40,7 @@
 
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].patron_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
-          <td><form onsubmit="checkedOutTableRemoval(<%= data[i].patron_id %>)"><button value ="<%= data[i].patron_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+          <td><form onsubmit="checkedOutTableRemoval(<%= data[i].patron_id %>,<%= data[i].book_id %>)"><button value ="<%= data[i].patron_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
         </tr>
 
       <%}%>

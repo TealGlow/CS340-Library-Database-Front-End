@@ -28,35 +28,36 @@ var idName="";
 
 
 // select query
-const selectQuery = selectQ`SELECT * FROM ${tableName}`; // use this for all tables
+const selectQuery = selectQ`SELECT * FROM ${tableName};`; // use this for all tables
 
 // insert queries
-const insertBooksQuery = `INSERT INTO Books (book_id, isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?,?);`;
-const insertPatronsQuery = `INSERT INTO Patrons (patron_id, first_name, last_name, address, phone) VALUES (?,?,?,?,?);`;
-
-
-const insertAuthorsQuery = `INSERT INTO Authors(author_id, first_name, last_name) VALUES(?, ?, ?);`;
-const insertSectionsQuery = `INSERT INTO Sections(section_id, section_name) VALUES(?, ?);`;
-const insertPublishersQuery = `INSERT INTO Publishers (publisher_id, company_name) VALUES (?,?);`;
+const insertBooksQuery = `INSERT INTO Books (isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?);`;
+const insertPatronsQuery = `INSERT INTO Patrons (first_name, last_name, address, phone) VALUES (?,?,?,?);`;
+const insertAuthorsQuery = `INSERT INTO Authors(first_name, last_name) VALUES(?, ?, ?);`;
+const insertSectionsQuery = `INSERT INTO Sections(section_name) VALUES(?);`;
+const insertPublishersQuery = `INSERT INTO Publishers (company_name) VALUES (?);`;
 const insertCheckedOutBooksQuery = `INSERT INTO CheckedOutBooks(patron_id, book_id) VALUES (?,?);`;
 const insertBookAuthorQuery =  `INSERT INTO BookAuthors(author_id, book_id) VALUES(?,?);`;
 
 
-// var searchInput = "";
-// const searchByTitle = searchTitleQ`SELECT title, first_name, last_name FROM Books JOIN BookAuthors ON BookAuthors.book_id = Books.book_id JOIN Authors ON Authors.author_id = BookAuthors.author_id;WHERE title = ${titleName};`;
-
 // update queries
-const modifyBooksQuery = `UPDATE Books SET book_id=?, isbn=?, title=?, pages=?, publication=?, publisher_id=?, section_id=?, on_shelf=? WHERE book_id=?`;
+const modifyBooksQuery = `UPDATE Books SET isbn=?, title=?, pages=?, publication=?, publisher_id=?, section_id=?, on_shelf=? WHERE book_id=?`;
 const modifyCheckedOutBooks = `UPDATE CheckedOutBooks SET patron_id=?, book_id=? WHERE (patron_id = ? AND Book_id=?);`;
 const modifyBookAuthors = `UPDATE BookAuthors SET author_id=?, book_id=? WHERE(author_id=? AND book_id=?);`;
-const modifyPublishersQuery = `UPDATE Publishers SET publisher_id = ?, company_name=? WHERE publisher_id=?;`;
-const modifyPatronsQuery = `UPDATE Patrons SET patron_id = ?, first_name=?, last_name=?, address=?, phone=? WHERE patron_id=?;`;
-const modifySectionsQuery = `UPDATE Sections SET section_id=?, section_name=? WHERE section_id=?;`;
-const modifyAuthorsQuery = `UPDATE Authors SET author_id=?, first_name=?, last_name=? WHERE author_id=?;`;
+const modifyPublishersQuery = `UPDATE Publishers SET company_name=? WHERE publisher_id=?;`;
+const modifyPatronsQuery = `UPDATE Patrons SET first_name=?, last_name=?, address=?, phone=? WHERE patron_id=?;`;
+const modifySectionsQuery = `UPDATE Sections SET section_name=? WHERE section_id=?;`;
+const modifyAuthorsQuery = `UPDATE Authors SET first_name=?, last_name=? WHERE author_id=?;`;
+
+
+
+// delete Queries
+const deleteQuery = `DELETE FROM ${tableName} WHERE book_id=${idName};`;
+const deleteBookAuthors = `DELETE FROM BookAuthors WHERE author_id=? AND book_id=?;`;
+const deleteCheckedOutBooksQuery = `DELETE FROM CheckedOutBooks WHERE patron_id=? AND book_id=?;`;
 
 
 function searchTitleQ(title) {
-    console.log(title);
     return `SELECT title, first_name, last_name
             FROM Books
             JOIN BookAuthors ON BookAuthors.book_id = Books.book_id
@@ -79,6 +80,7 @@ function searchAuthorQ(author) {
 }
 
 
+
 function searchPublisherQ(publisher) {
     return `SELECT title, first_name, last_name, on_shelf
             FROM Books
@@ -88,8 +90,6 @@ function searchPublisherQ(publisher) {
             WHERE company_name = ${publisher};`;
 }
 
-// delete Queries
-const deleteQuery = `DELETE FROM ${tableName} WHERE book_id=${idName};`;
 
 
 function searchSectionQ(section) {
@@ -102,25 +102,11 @@ function searchSectionQ(section) {
 }
 
 
+
 function selectQ(tblName){
   // template selectQuery
   return  `SELECT * FROM ${tblName};`;
 };
-
-
-/* FAKE DATA */
-
-
-var tempPublishersTable = [
-  {
-    publisher_id:0,
-    company_name:"Temp Name 1"
-  },
-  {
-    publisher_id:1,
-    company_name:"Temp Name 2"
-  }
-];
 
 
 
@@ -128,6 +114,7 @@ function setSearchByIdNameAndId(tblName, idName){
   // template search by id query.
   return `SELECT * FROM ${tblName} WHERE ${idName}=?;`;
 };
+
 
 
 function setDeleteQuery(tblName, idName){
@@ -169,60 +156,6 @@ app.post("/index.html", (req, res) => {
 
 
 
-
-app.get("/books.html", (req, res)=>{
-  // for now this displays all the books in the library
-
-  // books page, for now displays the temp books array, we need to
-  // actually get data from our db and send it to the page
-  // I got it working with ejs really fast.
-
-  // this is where the query would go for showing all books
-  var tempBook = [
-    {
-    book_id:1,
-    isbn:0000000,
-    title:"Book title 1",
-    pages:300,
-    publication:new Date(),
-    publisher_id:1,
-    on_shelf:true,
-    section_name:"Art",
-    authors:[{f_name:"temp1",l_name:"temp2"}],
-    publisher_name:"Publisher name!"
-  },
-  {
-    book_id:2,
-    isbn:1111111,
-    title:"book title 2",
-    pages:301,
-    publication:new Date(),
-    publisher_id:1,
-    on_shelf:false,
-    section_name:"Mathematics",
-    authors:[{f_name:"temp1",l_name:"temp2"}, {f_name:"temp3",l_name:"temp4"}, {f_name:"temp5",l_name:"temp5"}],
-    publisher_name:"Hello"
-  },
-  {
-    book_id:3,
-    isbn:1111111,
-    title:"book title 3",
-    pages:301,
-    publication:new Date(),
-    publisher_id:5,
-    on_shelf:true,
-    section_name:"Computer Science",
-    authors:[{f_name:"temp1",l_name:"temp2"}],
-    publisher_name:"Another publisher"
-  }
-];
-
-  // renders the page with the ejs templating using the tempBooks data above
-  res.render("pages/books.ejs", {data:tempBook, searchTitle:""});
-});
-
-
-
 /*
       BOOKS TABLE
 */
@@ -257,9 +190,7 @@ app.post("/booksTable", (req, res)=>{
     console.error("No req body");
   }else{
 
-    console.log(parseInt(req.body.on_shelf));
-
-    var bid = req.body.book_id;
+    /*var bid = req.body.book_id;*/
     var isb = req.body.isbn;
     var ti = req.body.title;
     var pa = req.body.pages;
@@ -268,10 +199,11 @@ app.post("/booksTable", (req, res)=>{
     var sid = req.body.section_id;
     var ons = req.body.on_shelf;
 
-    console.log("ONS", ons);
+    console.log(pub);
+
     var context={};
     // validation of the POST request data.
-    mysql.pool.query(insertBooksQuery, [bid, isb, ti, pa, pub, pid, sid, ons], (err, result)=>{
+    mysql.pool.query(insertBooksQuery, [/*bid,*/ isb, ti, pa, pub, pid, sid, ons], (err, result)=>{
       if(err){
         console.error(err);
         return;
@@ -299,7 +231,7 @@ app.put("/booksTable", (req,res)=>{
   console.log("hello",req.body);
 
   var context = {};
-  mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.prev_id || req.query.prev_id], (err, result)=>{
+  mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.book_id || req.query.book_id], (err, result)=>{
     if(err){
       return;
     }else{
@@ -309,7 +241,6 @@ app.put("/booksTable", (req,res)=>{
         var tempCurrentValues = result[0];
         // query the db to change items if they changed at all! else keep the current values
         mysql.pool.query(modifyBooksQuery, [
-          req.body.book_id|| req.query.book_id || tempCurrentValues.book_id,
           req.body.isbn || req.query.isbn || tempCurrentValues.isbn,
           req.body.title || req.query.title || tempCurrentValues.title,
           req.body.pages || req.query.pages || tempCurrentValues.pages,
@@ -317,14 +248,13 @@ app.put("/booksTable", (req,res)=>{
           parseInt(req.body.publisher_id) || parseInt(req.query.publisher_id) || parseInt(tempCurrentValues.publisher_id),
           parseInt(req.body.section_id) || parseInt(req.query.section_id) || parseInt(tempCurrentValues.section_id),
           parseInt(req.body.on_shelf),
-          req.body.prev_id || req.query.prev_id], (err, result)=>{
+          req.body.book_id || req.query.book_id], (err, result)=>{
           // update here
           if(err){
             console.error(err);
             return;
           }else{
             console.log("updated!");
-            //context.results = "Updated rows";
             res.send();
           }
         });
@@ -392,7 +322,6 @@ app.post("/patronsTable", (req, res)=>{
   if(!req.body){
     console.error("No req body");
   }else{
-    var pid = parseInt(removeSpecialCharacters(req.body.patron_id));
     var fn = removeSpecialCharacters(req.body.first_name);
     var ln = removeSpecialCharacters(req.body.last_name);
     var add = req.body.address;
@@ -402,13 +331,13 @@ app.post("/patronsTable", (req, res)=>{
 
     // validation of the POST request data.
 
-    if(!req.body || !pid || !fn || !ln || !add | !ph){
+    if(!req.body || !fn || !ln || !add | !ph){
       // user did not enter an item, give them an error and do not add the DATA
       res.render("pages/patronsTable.ejs", {data:tempPatronsData, error:"Please enter all data fields."})
     }else{
       var context={};
       // validation of the POST request data.
-      mysql.pool.query(insertPatronsQuery, [pid, fn, ln, add, ph], (err, result)=>{
+      mysql.pool.query(insertPatronsQuery, [fn, ln, add, ph], (err, result)=>{
         if(err){
           console.error(err);
           return;
@@ -431,17 +360,16 @@ app.put("/patronsTable", (req,res)=>{
   if(!req.body){
     return;
   }else{
-    mysql.pool.query(setSearchByIdNameAndId("Patrons", "patron_id"),  [req.body.prev_id || req.query.prev_id], (err, rows)=>{
+    mysql.pool.query(setSearchByIdNameAndId("Patrons", "patron_id"),  [req.body.patron_id || req.query.patron_id], (err, rows)=>{
       console.log("rows",rows);
       if(!err){
         // modify query
         mysql.pool.query(modifyPatronsQuery, [
-              parseInt(req.body.patron_id) || rows[0].patron_id || parseInt(req.query.patron_id),
               req.body.first_name||req.query.first_name || rows[0].first_name,
               req.body.last_name || req.query.last_name || rows[0].last_name,
               req.body.address || req.query.address || rows[0].address,
               req.body.phone || req.query.phone || rows[0].phone,
-              parseInt(req.body.prev_id)
+              parseInt(req.body.patron_id)
             ],
             (err, result)=>{
               console.log("here");
@@ -520,12 +448,11 @@ app.post("/sectionsTable", (req, res) => {
     if (!req.body) {
         console.error("No req body");
     } else {
-        var sid = req.body.section_id;
         var name = req.body.section_name;
 
         var context = {};
         // validation of the POST request data.
-        mysql.pool.query(insertSectionsQuery, [sid, name], (err, result) => {
+        mysql.pool.query(insertSectionsQuery, [name], (err, result) => {
             if (err) {
                 console.error(err);
                 return;
@@ -548,10 +475,10 @@ app.put("/sectionsTable", (req, res)=>{
   if(!req.body){
     return;
   }else{
-    mysql.pool.query(setSearchByIdNameAndId("Sections", "section_id"),  [req.body.prev_id || req.query.prev_id], (err, rows)=>{
+    mysql.pool.query(setSearchByIdNameAndId("Sections", "section_id"),  [req.query.section_id], (err, rows)=>{
       if(!err){
         // modify query
-        mysql.pool.query(modifySectionsQuery, [parseInt(req.body.section_id) || rows[0].section_id || parseInt(req.query.section_id), req.body.section_name|| rows[0].section_name, parseInt(req.body.prev_id)], (err, result)=>{
+        mysql.pool.query(modifySectionsQuery, [req.body.section_name|| rows[0].section_name, parseInt(req.body.section_id)], (err, result)=>{
           if(err){
 
             console.error("Error updating Sections");
@@ -628,12 +555,12 @@ app.post("/publishersTable", (req, res)=>{
   if(!req.body){
     console.error("No req body");
   }else{
-    var pid = parseInt(req.body.publisher_id);
+    /*var pid = parseInt(req.body.publisher_id);*/
     var cn = req.body.company_name;
 
     var context={};
     // validation of the POST request data.
-    mysql.pool.query(insertPublishersQuery , [pid, cn], (err, result)=>{
+    mysql.pool.query(insertPublishersQuery , [cn], (err, result)=>{
       if(err){
         console.error(err);
         return;
@@ -656,10 +583,10 @@ app.put("/publishersTable", (req, res)=>{
   if(!req.body){
     return;
   }else{
-    mysql.pool.query(setSearchByIdNameAndId("Publishers", "publisher_id"),  [req.body.prev_id || req.query.prev_id], (err, rows)=>{
+    mysql.pool.query(setSearchByIdNameAndId("Publishers", "publisher_id"),  [req.body.publisher_id || req.query.publisher_id], (err, rows)=>{
       if(!err){
         // modify query
-        mysql.pool.query(modifyPublishersQuery, [parseInt(req.body.publisher_id) || rows[0].publisher_id || parseInt(req.query.publisher_id), req.body.company_name|| rows[0].company_name, parseInt(req.body.prev_id)], (err, result)=>{
+        mysql.pool.query(modifyPublishersQuery, [req.body.company_name|| rows[0].company_name, parseInt(req.body.publisher_id) || parseInt(req.query.publisher_id)], (err, result)=>{
           if(err){
 
             console.error("Error updating publihsers");
@@ -733,13 +660,12 @@ app.post("/authorsTable", (req, res) => {
     if (!req.body) {
         console.error("No req body");
     } else {
-        var aid = req.body.section_id;
         var fn = req.body.first_name;
         var ln = req.body.last_name
 
         var context = {};
         // validation of the POST request data.
-        mysql.pool.query(insertAuthorsQuery, [aid, fn, ln], (err, result) => {
+        mysql.pool.query(insertAuthorsQuery, [fn, ln], (err, result) => {
             if (err) {
                 console.error(err);
                 return;
@@ -763,10 +689,10 @@ app.put("/authorsTable", (req, res)=>{
   if(!req.body){
     return;
   }else{
-    mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"),  [req.body.prev_id || req.query.prev_id], (err, rows)=>{
+    mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"),  [req.body.author_id || req.query.author_id], (err, rows)=>{
       if(!err){
         // modify query
-        mysql.pool.query(modifyAuthorsQuery, [parseInt(req.body.author_id) || rows[0].author_id || parseInt(req.query.author_id), req.body.first_name|| rows[0].first_name || req.query.first_name, req.body.last_name || req.query.last_name || rows[0].last_name, parseInt(req.body.prev_id)], (err, result)=>{
+        mysql.pool.query(modifyAuthorsQuery, [req.body.first_name|| rows[0].first_name || req.query.first_name, req.body.last_name || req.query.last_name || rows[0].last_name, parseInt(req.body.author_id)||parseInt(req.query.author_id)], (err, result)=>{
           if(err){
 
             console.error("Error updating Authors");
@@ -888,6 +814,31 @@ app.put("/CheckedOutBooks", (req, res)=>{
 });
 
 
+
+app.delete("/checkedOutBooks", (req, res)=>{
+  mysql.pool.query(searchCheckedOutBooks, [req.body.patron_id || req.query.patron_id, req.body.book_id || req.query.book_id], (err, result)=>{
+    if(err){
+      // error finding row
+      console.error("Error deleting row");
+      return;
+    }else{
+      if(result.length == 1){
+        // delete row from the table
+        mysql.pool.query(deleteCheckedOutBooksQuery, [req.body.patron_id || req.query.patron_id, req.body.book_id|| req.query.book_id], (err, result)=>{
+          if(err){
+            console.error("Error deleting");
+          }else{
+            // delete happened
+            console.log("Deleted!");
+            res.send();
+          }
+        });
+      }
+    }
+  });
+});
+
+
 /*
 
   FUNCTIONS THAT HANDLE THE BOOKAUTHORS TABLE
@@ -950,7 +901,6 @@ app.post("/BookAuthors", (req, res)=>{
 
 app.put("/BookAuthors", (req, res)=>{
   // updates the item if there was a change
-  console.log("hello",req.body);
 
   if(!req.body){
     return;
@@ -970,6 +920,31 @@ app.put("/BookAuthors", (req, res)=>{
     });
 
   }
+});
+
+
+
+app.delete("/BookAuthors", (req, res)=>{
+  mysql.pool.query(searchBookAuthors, [req.body.author_id || req.query.author_id, req.body.book_id || req.query.book_id], (err, result)=>{
+    if(err){
+      // error finding row
+      console.error("Error deleting row");
+      return;
+    }else{
+      if(result.length == 1){
+        // delete row from the table
+        mysql.pool.query(deleteBookAuthors, [req.body.author_id || req.query.author_id, req.body.book_id|| req.query.book_id], (err, result)=>{
+          if(err){
+            console.error("Error deleting");
+          }else{
+            // delete happened
+            console.log("Deleted!");
+            res.send();
+          }
+        });
+      }
+    }
+  });
 });
 
 

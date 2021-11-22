@@ -7,8 +7,6 @@
     <!-- form to add data -->
     <div class="form-container center">
       <form class="addData element-col" onSubmit="addAndValidateFormBooks()">
-        <label for="book_id">Book_id:</label>
-        <input type="number" name="book_id" class="form-control form-control-add">
 
         <label>isbn:</label>
         <input type="number" name="isbn" class="form-control form-control-add">
@@ -61,7 +59,7 @@
 
         <tr>
           <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormBooks(<%=i%>)">
-            <td><input type="number" name="book_id" placeholder="<%=data[i].book_id%>"></td>
+            <td style="text-align:center"><strong><%=data[i].book_id%></strong></td>
             <td><input type="number" name="isbn" placeholder="<%=data[i].isbn%>" > </td>
             <td><input name="title" placeholder="<%=data[i].title%>" > </td>
             <td><input type="number" name="pages" placeholder="<%=data[i].pages%>" > </td>
@@ -98,7 +96,7 @@
                   <option value="0">False</option>
                 <%}%>
             </select></td>
-            <td><button class="btn btn-dark" name="modify" value="<%=data[i].book_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
+            <td><button class="btn btn-dark" name="modify" value="<%= data[i].book_id %>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
           <td><form onsubmit="booksTableRemoval(<%= data[i].book_id %>)"><button value ="<%= data[i].book_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
         </tr>
