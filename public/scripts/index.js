@@ -43,8 +43,9 @@ const addAndValidateFormBooks = async ()=>{
 
     console.log(BASE_URL);
 
-    let temp = document.getElementsByClassName("form-control");
-    console.log(temp);
+    let temp = document.getElementsByClassName("form-control-add");
+
+
     var data={
       book_id:"",
       isbn:"",
@@ -56,24 +57,21 @@ const addAndValidateFormBooks = async ()=>{
       on_shelf:""
     };
 
-    console.log("temp",temp);
-
     // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
 
     for(var i=0; i<temp.length; i++){
       data[temp[i].name] = await cleanData(temp[i].value);
     }
+
     data["publication"] = new Date(temp[4].value);
     data["book_id"] = parseInt(data["book_id"]);
     data["section_id"] = parseInt(data["section_id"]);
     data["publisher_id"] = parseInt(data["publisher_id"]);
     data["pages"] = parseInt(data["pages"]);
+    data["on_shelf"] = parseInt(data["on_shelf"]);
+    console.log(temp);
+    console.log(data);
 
-    if(data["on_shelf"] == "0"){
-      data["on_shelf"]=0;
-    }else{
-      data["on_shelf"]=1;
-    }
 
     if(data["book_id"] == "" || data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == ""){
       console.log("Error please enter all data fields!");

@@ -10,7 +10,9 @@ html,body{
   overflow: hidden;
 }
 
-
+::-moz-placeholder{
+  color:black;
+}
 
 .navbar{
   position:fixed;
@@ -26,11 +28,35 @@ html,body{
       MAIN ALL PAGES STYLING
 */
 
+.table-container{
+  display:flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  margin-bottom:100px;
+  padding-bottom:150px;
+}
 
+
+.addData{
+  width:25%;
+  min-width:300px;
+}
+
+.addData label{
+  justify-self: flex-start;
+}
+
+
+.form-container{
+  width:100%;
+}
+
+.table-elements{
+  align-self:center;
+}
 
 .myContainer{
-  margin-top:55px;
-  padding-bottom:55px;
+  padding:100px;
   height:100%;
   width:100%;
   overflow-y: auto;

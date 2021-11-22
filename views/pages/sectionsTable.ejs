@@ -1,26 +1,28 @@
 <%- include ("../partials/header") %>
-<div class="myContainer center element-col">
+<div class="myContainer table-container element-col ">
   <%if(error!=""){%>
     <div class="not-avail"><%=error%></div>
   <%}%>
   <!-- form to add data -->
-  <form class="addData" onSubmit="addAndValidateFormSections()">
-    <label for="section_id">Section_id:</label>
-    <input type="number" name="section_id" class="form-control">
+  <div class="form-container center">
+    <form class="addData element-col" onSubmit="addAndValidateFormSections()">
+      <label for="section_id">Section_id:</label>
+      <input type="number" name="section_id" class="form-control">
 
-    <label>Section_name:</label>
-    <input type="text" name="section_name" class="form-control">
+      <label>Section_name:</label>
+      <input type="text" name="section_name" class="form-control">
 
-    <button class="btn btn-dark" type="Submit">Add</button>
-    <div class="not-avail" id="data-add-error"></div>
+      <button class="btn btn-dark" type="Submit">Add</button>
+      <div class="not-avail" id="data-add-error"></div>
 
-    <br/>
-    <br/>
+      <br/>
+      <br/>
 
-  </form>
+    </form>
+  </div>
 
   <!-- form to show data in table-->
-  <table>
+  <table class="table-elements">
     <tr>
       <th><u>Section id</u></th>
       <th>Section Name</th>
