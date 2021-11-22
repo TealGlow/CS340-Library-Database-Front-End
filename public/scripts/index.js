@@ -2,6 +2,7 @@ const BASE_URL = "http://"+window.location.hostname+":"+window.location.port;
 
 
 
+
 const getSearchInput = async () => {
     event.preventDefault();
 
@@ -181,16 +182,18 @@ const validateFormSections = async (i)=>{
   let toSubmit = temp[i];
 
   var data={
-    "section_id":"",
-    "section_name":"",
-    "prev_id":parseInt(toSubmit[toSubmit.length-1].value)
+    section_id:"",
+    section_name:"",
+    prev_id:parseInt(toSubmit[0].placeholder)
   };
+
 
 
 
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
+
   // after data clean
   reqServer("PUT", "/sectionsTable", data);
 };
@@ -201,7 +204,6 @@ const sectionsTableRemoval = async (i)=>{
   event.preventDefault();
   data={id:i}
 
-  console.log("Delete", i);
   reqServer("DELETE", "/sectionsTable", data);
 };
 
@@ -304,9 +306,6 @@ const patronsTableRemoval = async(i)=>{
 const addAndValidateFormPublishers = async ()=>{
   // FOR ADDING SOMETING INTO THE TABLE
   event.preventDefault();
-  // nothing in books can be null
-
-  // TO DO: DONT LET USER ENTER INCORRECT DATA
 
   let temp = document.getElementsByClassName("addData");
 
@@ -365,7 +364,6 @@ const publishersTableRemoval = async (i)=>{
   event.preventDefault();
   data={id:i}
 
-  console.log
   reqServer("DELETE", "/publishersTable", data);
 };
 
@@ -381,9 +379,6 @@ const publishersTableRemoval = async (i)=>{
 const addAndValidateFormAuthors = async ()=>{
   // FOR ADDING SOMETING INTO THE TABLE
   event.preventDefault();
-  // nothing in books can be null
-
-  // TO DO: DONT LET USER ENTER INCORRECT DATA
 
   let temp = document.getElementsByClassName("addData");
   var data={
@@ -420,12 +415,13 @@ const validateFormAuthors = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
+  console.log("hello");
 
   var data={
     author_id:"",
     first_name:"",
     last_name:"",
-    prev_id:i
+    prev_id:parseInt(toSubmit[0].placeholder)
   };
 
 
@@ -453,13 +449,12 @@ const authorsTableUpdate = async (i) => {
 
     console.log(rowData[0][0]);
 
-    //for (var i = 0; i < update[0].length - 1; i++) {
-    //    data[$(update)[0][i].name] = $(update)[0][i].value;
-    //    console.log(data[$(update)[0][i].name]);
-    //}
+    for (var i = 0; i < update[0].length - 1; i++) {
+        data[$(update)[0][i].name] = $(update)[0][i].value;
+    }
 
     // Send request to the DB
-    //reqServer("POST", "/authorsTable", data);
+    reqServer("POST", "/authorsTable", data);
 }
 
 
@@ -468,7 +463,7 @@ const authorsTableRemoval = async (i)=>{
   console.log("Delete ", i);
   data={id:i}
 
-  reqServer("DELETE", "/patronsTable", data);
+  reqServer("DELETE", "/authorsTable", data);
 };
 
 

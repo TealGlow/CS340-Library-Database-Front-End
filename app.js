@@ -52,6 +52,8 @@ const modifyBookAuthors = `UPDATE BookAuthors SET author_id=?, book_id=? WHERE(a
 const modifyPublishersQuery = `UPDATE Publishers SET publisher_id = ?, company_name=? WHERE publisher_id=?;`;
 const modifyPatronsQuery = `UPDATE Patrons SET patron_id = ?, first_name=?, last_name=?, address=?, phone=? WHERE patron_id=?;`;
 const modifySectionsQuery = `UPDATE Sections SET section_id=?, section_name=? WHERE section_id=?;`;
+const modifyAuthorsQuery = `UPDATE Authors SET author_id=?, first_name=?, last_name=? WHERE author_id=?;`;
+
 
 function searchTitleQ(title) {
     console.log(title);
@@ -756,16 +758,35 @@ app.post("/authorsTable", (req, res) => {
 
 
 app.put("/authorsTable", (req, res)=>{
-  tempAuthorsData["author_id"] = req.body.author_id;
-  tempAuthorsData["first_name"] = req.body.first_name;
-  tempAuthorsData["last_name"] = req.body.last_name;
-  res.send("got a PUT request");
+  console.log("EDIT AUTHORS");
+
+  if(!req.body){
+    return;
+  }else{
+    mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"),  [req.body.prev_id || req.query.prev_id], (err, rows)=>{
+      if(!err){
+        // modify query
+        mysql.pool.query(modifyAuthorsQuery, [parseInt(req.body.author_id) || rows[0].author_id || parseInt(req.query.author_id), req.body.first_name|| rows[0].first_name || req.query.first_name, req.body.last_name || req.query.last_name || rows[0].last_name, parseInt(req.body.prev_id)], (err, result)=>{
+          if(err){
+
+            console.error("Error updating Authors");
+          }
+          // successfully found and modified row.
+          console.log("success", result);
+          res.send();
+        });
+      }
+    });
+
+  }
+
 });
 
 
 
 app.delete("/authorsTable", (req, res)=>{
   // search for the row
+  console.log("delete");
   mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"), [req.body.id || req.query.id], (err, result)=>{
     if(err){
       // error finding row
