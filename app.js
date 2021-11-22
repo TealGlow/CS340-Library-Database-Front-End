@@ -51,7 +51,7 @@ const modifyCheckedOutBooks = `UPDATE CheckedOutBooks SET patron_id=?, book_id=?
 const modifyBookAuthors = `UPDATE BookAuthors SET author_id=?, book_id=? WHERE(author_id=? AND book_id=?);`;
 const modifyPublishersQuery = `UPDATE Publishers SET publisher_id = ?, company_name=? WHERE publisher_id=?;`;
 const modifyPatronsQuery = `UPDATE Patrons SET patron_id = ?, first_name=?, last_name=?, address=?, phone=? WHERE patron_id=?;`;
-
+const modifySectionsQuery = `UPDATE Sections SET section_id=?, section_name=? WHERE section_id=?;`;
 
 function searchTitleQ(title) {
     console.log(title);
@@ -314,7 +314,7 @@ app.put("/booksTable", (req,res)=>{
           req.body.publication || req.query.publication || tempCurrentValues.publication,
           parseInt(req.body.publisher_id) || parseInt(req.query.publisher_id) || parseInt(tempCurrentValues.publisher_id),
           parseInt(req.body.section_id) || parseInt(req.query.section_id) || parseInt(tempCurrentValues.section_id),
-          parseInt(req.body.on_shelf) /*|| parseInt(req.query.on_shelf)*/,
+          parseInt(req.body.on_shelf),
           req.body.prev_id || req.query.prev_id], (err, result)=>{
           // update here
           if(err){
@@ -538,27 +538,30 @@ app.post("/sectionsTable", (req, res) => {
         res.redirect("/sectionsTable.html");
     }
 
-
-
-
-  //console.log(req.body);
-  //var temp={
-  //  section_id:req.body.section_id,
-  //  section_name:req.body.section_name
-  //};
-  //console.log(tempSectionData)
-  //tempSectionData.push(temp);
-  //res.render("pages/sectionsTable.ejs", {data:tempSectionData, error:""});
 });
 
 
 
 app.put("/sectionsTable", (req, res)=>{
-  // TODO: if only 1 thing was modified we dont wanna modify the entire table
-  // again right?
-  tempSectionData["section_id"] = req.body.section_id;
-  tempSectionData["section_name"] = req.body.section_name;
-  res.send("got a PUT request");
+  if(!req.body){
+    return;
+  }else{
+    mysql.pool.query(setSearchByIdNameAndId("Sections", "section_id"),  [req.body.prev_id || req.query.prev_id], (err, rows)=>{
+      if(!err){
+        // modify query
+        mysql.pool.query(modifySectionsQuery, [parseInt(req.body.section_id) || rows[0].section_id || parseInt(req.query.section_id), req.body.section_name|| rows[0].section_name, parseInt(req.body.prev_id)], (err, result)=>{
+          if(err){
+
+            console.error("Error updating Sections");
+          }
+          // successfully found and modified row.
+          console.log("success", result);
+          res.send();
+        });
+      }
+    });
+
+  }
 });
 
 
