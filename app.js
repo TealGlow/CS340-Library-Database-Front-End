@@ -855,7 +855,7 @@ app.delete("/checkedOutBooks", (req, res)=>{
         console.error("Error deleting row");
         res.sendStatus(403);
       }else{
-        if(result.length == 1){
+        //if(result.length == 1){
           // delete row from the table
           mysql.pool.query(deleteCheckedOutBooksQuery, [req.body.patron_id || req.query.patron_id, req.body.book_id|| req.query.book_id], (err, result)=>{
             if(err){
@@ -867,7 +867,7 @@ app.delete("/checkedOutBooks", (req, res)=>{
               res.send();
             }
           });
-        }
+        //}
       }
     });
   }
