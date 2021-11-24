@@ -124,6 +124,13 @@ function setDeleteQuery(tblName, idName){
 
 
 
+const getSectionIds = async function (p){
+  const results = await mysql.pool.query(`SELECT section_id FROM Sections;`);
+  console.log(results);
+  p.resolve(results);
+}
+
+
 
 /*
     FUNCTIONS TO HANDLE THE MAIN PAGE OF THE WEBSITE
@@ -151,6 +158,7 @@ app.get("/index.html", (req, res)=>{
 });
 
 
+
 app.post("/index.html", (req, res) => {
     console.log(req.body);
 });
@@ -172,7 +180,6 @@ app.get("/booksTable.html", (req, res)=>{
         res.render("pages/booksTable.ejs", {data:"", error:"Error getting table data"});
       }else{
         // else do something with the data
-        console.log(rows);
         res.render("pages/booksTable.ejs", {data:rows, error:""});
       }
     });
@@ -182,13 +189,9 @@ app.get("/booksTable.html", (req, res)=>{
 add
 */
 app.post("/booksTable", (req, res)=>{
-  // add item to the booksTable
-  console.log("booksTable POST", req.body);
-
-  // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
-
   if(!req.body){
     console.error("No req body");
+    res.sendStatus(204);
   }else{
 
     /*var bid = req.body.book_id;*/
@@ -200,25 +203,18 @@ app.post("/booksTable", (req, res)=>{
     var sid = req.body.section_id;
     var ons = req.body.on_shelf;
 
-    console.log(pub);
-
-    var context={};
     // validation of the POST request data.
-    mysql.pool.query(insertBooksQuery, [/*bid,*/ isb, ti, pa, pub, pid, sid, ons], (err, result)=>{
+    mysql.pool.query(insertBooksQuery, [isb, ti, pa, pub, pid, sid, ons], (err, result)=>{
       if(err){
         console.error(err);
-        return;
+        res.sendStatus(400);
       }else{
         // successfully added new item
-        console.log("success");
-        context.results = "Inserted id " + result.insertId;
-        return;
+        res.redirect("/booksTable.html");
       }
     });
-    // redirect to page to show data.
-    res.redirect("/booksTable.html");
-  }
 
+  }
 
 });
 
@@ -229,39 +225,40 @@ update
 
 app.put("/booksTable", (req,res)=>{
   // updates the item if there was a change
-  console.log("hello",req.body);
-
-  var context = {};
-  mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.book_id || req.query.book_id], (err, result)=>{
-    if(err){
-      return;
-    }else{
-      console.log("got the row to change:");
-      // update items where
-      if(result.length == 1){
-        var tempCurrentValues = result[0];
-        // query the db to change items if they changed at all! else keep the current values
-        mysql.pool.query(modifyBooksQuery, [
-          req.body.isbn || req.query.isbn || tempCurrentValues.isbn,
-          req.body.title || req.query.title || tempCurrentValues.title,
-          req.body.pages || req.query.pages || tempCurrentValues.pages,
-          req.body.publication || req.query.publication || tempCurrentValues.publication,
-          parseInt(req.body.publisher_id) || parseInt(req.query.publisher_id) || parseInt(tempCurrentValues.publisher_id),
-          parseInt(req.body.section_id) || parseInt(req.query.section_id) || parseInt(tempCurrentValues.section_id),
-          parseInt(req.body.on_shelf),
-          req.body.book_id || req.query.book_id], (err, result)=>{
-          // update here
-          if(err){
-            console.error(err);
-            return;
-          }else{
-            console.log("updated!");
-            res.send();
-          }
-        });
+  if(!req.body){
+    console.error("No req body");
+    res.sendStatus(204);
+  }else{
+    mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.book_id || req.query.book_id], (err, result)=>{
+      if(err){
+        res.sendStatus(400);
+      }else{
+        // update items where
+        if(result.length == 1){
+          var tempCurrentValues = result[0];
+          // query the db to change items if they changed at all! else keep the current values
+          mysql.pool.query(modifyBooksQuery, [
+            req.body.isbn || req.query.isbn || tempCurrentValues.isbn,
+            req.body.title || req.query.title || tempCurrentValues.title,
+            req.body.pages || req.query.pages || tempCurrentValues.pages,
+            req.body.publication || req.query.publication || tempCurrentValues.publication,
+            parseInt(req.body.publisher_id) || parseInt(req.query.publisher_id) || parseInt(tempCurrentValues.publisher_id),
+            parseInt(req.body.section_id) || parseInt(req.query.section_id) || parseInt(tempCurrentValues.section_id),
+            parseInt(req.body.on_shelf),
+            req.body.book_id || req.query.book_id], (err, result)=>{
+            // update here
+            if(err){
+              console.error(err);
+              res.sendStatus(400);
+            }else{
+              console.log("updated!");
+              res.sendStatus(200);
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
 });
 
 
@@ -270,25 +267,30 @@ delete
 */
 
 app.delete("/booksTable", (req, res)=>{
-  mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.id || req.query.id], (err, result)=>{
-    if(err){
-      console.error("Error deleting row");
-      return;
-    }else{
-      console.log("to delete",result);
-      if(result.length == 1){
-        console.log("got this far");
-        mysql.pool.query(setDeleteQuery("Books", "book_id"), [req.body.id || req.query.id], (err, result)=>{
-          if(err){
-            console.error("Error deleting");
-          }else{
-            console.log("Deleted!");
-            res.send();
-          }
-        });
+  if(!req.body){
+    console.error("No req body");
+    res.sendStatus(204);
+  }else{
+    mysql.pool.query(setSearchByIdNameAndId("Books", "book_id"), [req.body.id || req.query.id], (err, result)=>{
+      if(err){
+        console.error("Error deleting row");
+        res.sendStatus(403);
+      }else{
+        if(result.length == 1){
+          mysql.pool.query(setDeleteQuery("Books", "book_id"), [req.body.id || req.query.id], (err, result)=>{
+            if(err){
+              res.sendStatus(403);
+              console.error("Error deleting");
+            }else{
+              // success
+              res.sendStatus(200);
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
+
 });
 
 
@@ -298,7 +300,7 @@ app.delete("/booksTable", (req, res)=>{
 */
 
 app.get("/patronsTable.html", (req, res)=>{
-console.log("patronsTable GET", req.body);
+
   mysql.pool.query(selectQ("Patrons"), (err, rows, fields)=>{
     // get the patrons table
     if(err){
@@ -307,7 +309,6 @@ console.log("patronsTable GET", req.body);
       res.render("pages/patronsTable.ejs", {data:"", error:"Error getting table data"});
     }else{
       // else do something with the data
-      console.log(rows);
       res.render("pages/patronsTable.ejs", {data:rows, error:""});
     }
   });
@@ -315,51 +316,47 @@ console.log("patronsTable GET", req.body);
 });
 
 
-app.post("/patronsTable", (req, res)=>{
-  console.log("patronsTable POST", req.body);
 
+app.post("/patronsTable", (req, res)=>{
   // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
 
   if(!req.body){
     console.error("No req body");
+    res.sendStatus(204);
   }else{
     var fn = removeSpecialCharacters(req.body.first_name);
     var ln = removeSpecialCharacters(req.body.last_name);
     var add = req.body.address;
     var ph =  req.body.phone;
 
-    // TODO: CLEAN ADDRESS BETTER
-
     // validation of the POST request data.
 
-    if(!req.body || !fn || !ln || !add | !ph){
+    if(!fn || !ln || !add | !ph){
       // user did not enter an item, give them an error and do not add the DATA
       res.render("pages/patronsTable.ejs", {data:tempPatronsData, error:"Please enter all data fields."})
     }else{
-      var context={};
-      // validation of the POST request data.
       mysql.pool.query(insertPatronsQuery, [fn, ln, add, ph], (err, result)=>{
         if(err){
           console.error(err);
-          return;
+          res.sendStatus(400);
         }else{
           // successfully added new item
           console.log("success");
-          context.results = "Inserted id " + result.insertId;
-          return;
+          // redirect to page to show data.
+          res.redirect("/patronsTable.html");
         }
       });
-      // redirect to page to show data.
-      res.redirect("/patronsTable.html");
+
     }
   }
 });
 
 
+
 app.put("/patronsTable", (req,res)=>{
-  console.log(req.body);
   if(!req.body){
-    return;
+    console.error("No req body");
+    res.sendStatus(204);
   }else{
     mysql.pool.query(setSearchByIdNameAndId("Patrons", "patron_id"),  [req.body.patron_id || req.query.patron_id], (err, rows)=>{
       console.log("rows",rows);
@@ -373,14 +370,14 @@ app.put("/patronsTable", (req,res)=>{
               parseInt(req.body.patron_id)
             ],
             (err, result)=>{
-              console.log("here");
           if(err){
             console.error("Error updating Patrons");
+            res.sendStatus(400);
             return;
           }
           // successfully found and modified row.
           console.log("success", result);
-          res.send();
+          res.sendStatus(200);
         });
       }
     });
@@ -389,28 +386,38 @@ app.put("/patronsTable", (req,res)=>{
 });
 
 
+
 app.delete("/patronsTable", (req, res)=>{
-  // search for the row
-  mysql.pool.query(setSearchByIdNameAndId("Patrons", "patron_id"), [req.body.id || req.query.id], (err, result)=>{
-    if(err){
-      // error finding row
-      console.error("Error deleting row");
-      return;
-    }else{
-      if(result.length == 1){
-        // delete row from the table
-        mysql.pool.query(setDeleteQuery("Patrons", "patron_id"), [req.body.id || req.query.id], (err, result)=>{
-          if(err){
-            console.error("Error deleting");
-          }else{
-            // delete happened
-            console.log("Deleted!");
-            res.send();
-          }
-        });
+
+  if(!req.body){
+    console.error("No req body");
+    res.sendStatus(204);
+  }else{
+    // search for the row
+    mysql.pool.query(setSearchByIdNameAndId("Patrons", "patron_id"), [req.body.id || req.query.id], (err, result)=>{
+      if(err){
+        // error finding row
+        console.error("Error deleting row");
+        res.sendStatus(403);
+        return;
+      }else{
+        if(result.length == 1){
+          // delete row from the table
+          mysql.pool.query(setDeleteQuery("Patrons", "patron_id"), [req.body.id || req.query.id], (err, result)=>{
+            if(err){
+              console.error("Error deleting");
+              res.sendStatus(403);
+            }else{
+              // delete happened
+              console.log("Deleted!");
+              res.sendStatus(200);
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
+
 });
 
 
@@ -423,7 +430,6 @@ app.delete("/patronsTable", (req, res)=>{
 
 app.get("/sectionsTable.html", (req,res)=>{
     // shows all the data in the sections table
-    console.log(selectQ("Sections"));
     mysql.pool.query(selectQ("Sections"), (err, rows, fields) => {
         // get the authors table!
         if (err) {
@@ -441,31 +447,25 @@ app.get("/sectionsTable.html", (req,res)=>{
 
 
 app.post("/sectionsTable", (req, res) => {
-    // add item to the booksTable
-    console.log("sectionsTable POST", req.body);
-
-    // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
-
     if (!req.body) {
         console.error("No req body");
+        res.sendStatus(204);
     } else {
         var name = req.body.section_name;
 
-        var context = {};
         // validation of the POST request data.
         mysql.pool.query(insertSectionsQuery, [name], (err, result) => {
             if (err) {
                 console.error(err);
-                return;
+                res.sendStatus(400);
             } else {
                 // successfully added new item
                 console.log("success");
-                context.results = "Inserted id " + result.insertId;
-                return;
+                // redirect to page to show data.
+                res.redirect("/sectionsTable.html");
             }
         });
-        // redirect to page to show data.
-        res.redirect("/sectionsTable.html");
+
     }
 
 });
@@ -474,19 +474,22 @@ app.post("/sectionsTable", (req, res) => {
 
 app.put("/sectionsTable", (req, res)=>{
   if(!req.body){
-    return;
+    console.error("No req body");
+    res.sendStatus(204);
   }else{
     mysql.pool.query(setSearchByIdNameAndId("Sections", "section_id"),  [req.query.section_id], (err, rows)=>{
       if(!err){
         // modify query
         mysql.pool.query(modifySectionsQuery, [req.body.section_name|| rows[0].section_name, parseInt(req.body.section_id)], (err, result)=>{
           if(err){
-
             console.error("Error updating Sections");
+            res.sendStatus(400);
+          }else{
+            // successfully found and modified row.
+            console.log("success", result);
+            res.sendStatus(200);
           }
-          // successfully found and modified row.
-          console.log("success", result);
-          res.send();
+
         });
       }
     });
@@ -497,23 +500,31 @@ app.put("/sectionsTable", (req, res)=>{
 
 // check this since the sections table doesnt display yet
 app.delete("/sectionsTable", (req, res)=>{
-  mysql.pool.query(setSearchByIdNameAndId("Sections", "section_id"), [req.body.id || req.query.id], (err, result)=>{
-    if(err){
-      console.error("Error deleting row");
-      return;
-    }else{
-      if(result.length == 1){
-        mysql.pool.query(setDeleteQuery("Sections", "section_id"), [req.body.id || req.query.id], (err, result)=>{
-          if(err){
-            console.error("Error deleting");
-          }else{
-            console.log("Deleted!");
-            res.send();
-          }
-        });
+  if(!req.body){
+    console.error("No req body");
+    res.sendStatus(204);
+  }else{
+    mysql.pool.query(setSearchByIdNameAndId("Sections", "section_id"), [req.body.id || req.query.id], (err, result)=>{
+      if(err){
+        console.error("Error deleting row");
+        res.sendStatus(403);
+        return;
+      }else{
+        if(result.length == 1){
+          mysql.pool.query(setDeleteQuery("Sections", "section_id"), [req.body.id || req.query.id], (err, result)=>{
+            if(err){
+              console.error("Error deleting");
+              res.sendStatus(403);
+            }else{
+              console.log("Deleted!");
+              res.sendStatus(200);
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
+
 });
 
 
@@ -529,7 +540,6 @@ app.delete("/sectionsTable", (req, res)=>{
 app.get("/publishersTable.html", (req, res)=>{
 
   // shows all the data in the books table
-  console.log(selectQ("Publishers"));
 
   mysql.pool.query(selectQ("Publishers"), (err, rows, fields)=>{
     // get the books table!
@@ -555,6 +565,7 @@ app.post("/publishersTable", (req, res)=>{
 
   if(!req.body){
     console.error("No req body");
+    req.sendStatus(204);
   }else{
     /*var pid = parseInt(req.body.publisher_id);*/
     var cn = req.body.company_name;
@@ -564,16 +575,15 @@ app.post("/publishersTable", (req, res)=>{
     mysql.pool.query(insertPublishersQuery , [cn], (err, result)=>{
       if(err){
         console.error(err);
-        return;
+        res.sendStatus(400);
       }else{
         // successfully added new item
         console.log("success");
-        context.results = "Inserted id " + result.insertId;
-        return;
+        // redirect to page to show data.
+        res.redirect("/publishersTable.html");
       }
     });
-    // redirect to page to show data.
-    res.redirect("/publishersTable.html");
+
   };
 });
 
@@ -582,19 +592,22 @@ app.post("/publishersTable", (req, res)=>{
 app.put("/publishersTable", (req, res)=>{
 
   if(!req.body){
-    return;
+    console.error("No req body");
+    res.sendStatus(204);
   }else{
     mysql.pool.query(setSearchByIdNameAndId("Publishers", "publisher_id"),  [req.body.publisher_id || req.query.publisher_id], (err, rows)=>{
       if(!err){
         // modify query
         mysql.pool.query(modifyPublishersQuery, [req.body.company_name|| rows[0].company_name, parseInt(req.body.publisher_id) || parseInt(req.query.publisher_id)], (err, result)=>{
           if(err){
-
             console.error("Error updating publihsers");
+            res.sendStatus(400);
+          }else{
+            // successfully found and modified row.
+            console.log("success", result);
+            res.sendStatus(200);
           }
-          // successfully found and modified row.
-          console.log("success", result);
-          res.send();
+
         });
       }
     });
@@ -605,27 +618,35 @@ app.put("/publishersTable", (req, res)=>{
 
 
 app.delete("/publishersTable", (req, res)=>{
-  // search for the row
-  mysql.pool.query(setSearchByIdNameAndId("Publishers", "publisher_id"), [req.body.id || req.query.id], (err, result)=>{
-    if(err){
-      // error finding row
-      console.error("Error deleting row");
-      return;
-    }else{
-      if(result.length == 1){
-        // delete row from the table
-        mysql.pool.query(setDeleteQuery("Publishers", "publisher_id"), [req.body.id || req.query.id], (err, result)=>{
-          if(err){
-            console.error("Error deleting");
-          }else{
-            // delete happened
-            console.log("Deleted!");
-            res.send();
-          }
-        });
+
+  if(!req.body){
+    console.error("Nothing to delete");
+    req.sendStatus(204);
+  }else{
+    // search for the row
+    mysql.pool.query(setSearchByIdNameAndId("Publishers", "publisher_id"), [req.body.id || req.query.id], (err, result)=>{
+      if(err){
+        // error finding row
+        console.error("Error deleting row");
+        res.sendStatus(403);
+      }else{
+        if(result.length == 1){
+          // delete row from the table
+          mysql.pool.query(setDeleteQuery("Publishers", "publisher_id"), [req.body.id || req.query.id], (err, result)=>{
+            if(err){
+              console.error("Error deleting");
+              res.sendStatus(403);
+            }else{
+              // delete happened
+              console.log("Deleted!");
+              res.sendStatus(200);
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
+
 });
 
 
@@ -655,11 +676,11 @@ app.get("/authorsTable.html", (req, res) => {
 });
 
 
-
 // Insert new item into table
 app.post("/authorsTable", (req, res) => {
     if (!req.body) {
         console.error("No req body");
+        req.sendStatus(204);
     } else {
         var fn = req.body.first_name;
         var ln = req.body.last_name
@@ -669,26 +690,25 @@ app.post("/authorsTable", (req, res) => {
         mysql.pool.query(insertAuthorsQuery, [fn, ln], (err, result) => {
             if (err) {
                 console.error(err);
-                return;
+                res.sendStatus(400);
             } else {
                 // successfully added new item
                 console.log("success");
-                context.results = "Inserted id " + result.insertId;
-                return;
+                // redirect to page to show data.
+                res.redirect("/authorsTable.html");
             }
         });
-        // redirect to page to show data.
-        res.redirect("/authorsTable.html");
+
     }
 });
 
 
 
 app.put("/authorsTable", (req, res)=>{
-  console.log("EDIT AUTHORS");
 
   if(!req.body){
-    return;
+    console.error("No req body");
+    req.sendStatus(204);
   }else{
     mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"),  [req.body.author_id || req.query.author_id], (err, rows)=>{
       if(!err){
@@ -697,10 +717,13 @@ app.put("/authorsTable", (req, res)=>{
           if(err){
 
             console.error("Error updating Authors");
+            res.sendStatus(400);
+          }else{
+            // successfully found and modified row.
+            console.log("success", result);
+            res.sendStatus(200);
           }
-          // successfully found and modified row.
-          console.log("success", result);
-          res.send();
+
         });
       }
     });
@@ -713,27 +736,33 @@ app.put("/authorsTable", (req, res)=>{
 
 app.delete("/authorsTable", (req, res)=>{
   // search for the row
-  console.log("delete");
-  mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"), [req.body.id || req.query.id], (err, result)=>{
-    if(err){
-      // error finding row
-      console.error("Error deleting row");
-      return;
-    }else{
-      if(result.length == 1){
-        // delete row from the table
-        mysql.pool.query(setDeleteQuery("Authors", "author_id"), [req.body.id || req.query.id], (err, result)=>{
-          if(err){
-            console.error("Error deleting");
-          }else{
-            // delete happened
-            console.log("Deleted!");
-            res.send();
-          }
-        });
+  if(!req.body){
+    console.error("No req body");
+    req.sendStatus(204);
+  }else{
+    mysql.pool.query(setSearchByIdNameAndId("Authors", "author_id"), [req.body.id || req.query.id], (err, result)=>{
+      if(err){
+        // error finding row
+        console.error("Error deleting row");
+        res.sendStatus(403);
+      }else{
+        if(result.length == 1){
+          // delete row from the table
+          mysql.pool.query(setDeleteQuery("Authors", "author_id"), [req.body.id || req.query.id], (err, result)=>{
+            if(err){
+              console.error("Error deleting");
+              res.sendStatus(403);
+            }else{
+              // delete happened
+              console.log("Deleted!");
+              res.sendStatus(200);
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
+
 });
 
 
@@ -759,31 +788,27 @@ app.get("/CheckedOutBooks.html", (req, res)=>{
 
 
 app.post("/CheckedOutBooks", (req, res)=>{
-  console.log("CheckedOutBooks POST", req.body);
-
-  // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
 
   if(!req.body){
     console.error("No req body");
+    req.sendStatus(204);
   }else{
     var pid = parseInt(req.body.patron_id);
     var bid = parseInt(req.body.book_id);
 
-    var context={};
     // validation of the POST request data.
     mysql.pool.query(insertCheckedOutBooksQuery, [pid, bid], (err, result)=>{
       if(err){
         console.error(err);
-        return;
+        res.sendStatus(400);
       }else{
         // successfully added new item
         console.log("success");
-        context.results = "Inserted id " + result.insertId;
-        return;
+        // redirect to page to show data.
+        res.redirect("/CheckedOutBooks.html");
       }
     });
-    // redirect to page to show data.
-    res.redirect("/CheckedOutBooks.html");
+
   }
 
 });
@@ -794,7 +819,8 @@ app.put("/CheckedOutBooks", (req, res)=>{
   // updates the item if there was a change
 
   if(!req.body){
-    return;
+    console.error("No req body");
+    req.sendStatus(204);
   }else{
     mysql.pool.query(searchCheckedOutBooks, [parseInt(req.body.prev_patron_id) || parseInt(req.query.prev_patron_id), parseInt(req.body.prev_book_id)||parseInt(req.query.prev_book_id)], (err, rows)=>{
       if(!err){
@@ -802,10 +828,12 @@ app.put("/CheckedOutBooks", (req, res)=>{
         mysql.pool.query(modifyCheckedOutBooks, [parseInt(req.body.patron_id) || rows[0].patron_id, parseInt(req.body.book_id)|| rows[0].book_id, parseInt(req.body.prev_patron_id), parseInt(req.body.prev_book_id)], (err, result)=>{
           if(err){
             console.error("Error updating checked out books");
-
+            res.sendStatus(400);
+          }else{
+            console.log("success", result);
+            res.sendStatus(200);
           }
-          console.log("success", result);
-          res.send();
+
         });
       }
     });
@@ -817,26 +845,33 @@ app.put("/CheckedOutBooks", (req, res)=>{
 
 
 app.delete("/checkedOutBooks", (req, res)=>{
-  mysql.pool.query(searchCheckedOutBooks, [req.body.patron_id || req.query.patron_id, req.body.book_id || req.query.book_id], (err, result)=>{
-    if(err){
-      // error finding row
-      console.error("Error deleting row");
-      return;
-    }else{
-      if(result.length == 1){
-        // delete row from the table
-        mysql.pool.query(deleteCheckedOutBooksQuery, [req.body.patron_id || req.query.patron_id, req.body.book_id|| req.query.book_id], (err, result)=>{
-          if(err){
-            console.error("Error deleting");
-          }else{
-            // delete happened
-            console.log("Deleted!");
-            res.send();
-          }
-        });
+  if(!req.body){
+    console.error("No req body");
+    req.sendStatus(204);
+  }else{
+    mysql.pool.query(searchCheckedOutBooks, [req.body.patron_id || req.query.patron_id, req.body.book_id || req.query.book_id], (err, result)=>{
+      if(err){
+        // error finding row
+        console.error("Error deleting row");
+        res.sendStatus(403);
+      }else{
+        if(result.length == 1){
+          // delete row from the table
+          mysql.pool.query(deleteCheckedOutBooksQuery, [req.body.patron_id || req.query.patron_id, req.body.book_id|| req.query.book_id], (err, result)=>{
+            if(err){
+              console.error("Error deleting");
+              res.sendStatus(403);
+            }else{
+              // delete happened
+              console.log("Deleted!");
+              res.send();
+            }
+          });
+        }
       }
-    }
-  });
+    });
+  }
+
 });
 
 
@@ -847,10 +882,6 @@ app.delete("/checkedOutBooks", (req, res)=>{
 */
 
 app.get("/BookAuthors.html", (req, res)=>{
-  console.log(selectQ("BookAuthors"));
-
-  tableName = "BookAuthors";
-
   mysql.pool.query(selectQ("BookAuthors"), (err, rows, fields)=>{
     // get the books authors table!
     if(err){
@@ -868,32 +899,26 @@ app.get("/BookAuthors.html", (req, res)=>{
 
 
 app.post("/BookAuthors", (req, res)=>{
-  // add item to the booksTable
-  console.log("BookAuthors POST", req.body);
-
-  // CLEAN ALL SPECIAL CHARACTERS FROM ALL USER INPUTS!
-
   if(!req.body){
     console.error("No req body");
+    req.sendStatus(204);
   }else{
     var bid = parseInt(req.body.book_id);
     var aid = parseInt(req.body.author_id);
 
-    var context={};
     // validation of the POST request data.
     mysql.pool.query(insertBookAuthorQuery, [aid, bid], (err, result)=>{
       if(err){
         console.error(err);
-        return;
+        res.sendStatus(400);
       }else{
         // successfully added new item
         console.log("success");
-        context.results = "Inserted id " + result.insertId;
-        return;
+        // redirect to page to show data.
+        res.redirect("/BookAuthors.html");
       }
     });
-    // redirect to page to show data.
-    res.redirect("/BookAuthors.html");
+
   }
 
 });
@@ -904,7 +929,8 @@ app.put("/BookAuthors", (req, res)=>{
   // updates the item if there was a change
 
   if(!req.body){
-    return;
+    console.error("No req body");
+    req.sendStatus(204);
   }else{
     mysql.pool.query(searchBookAuthors, [parseInt(req.body.prev_author_id) || parseInt(req.query.prev_author_id), parseInt(req.body.prev_book_id)||parseInt(req.query.prev_book_id)], (err, rows)=>{
       if(!err){
@@ -912,10 +938,13 @@ app.put("/BookAuthors", (req, res)=>{
         mysql.pool.query(modifyBookAuthors, [parseInt(req.body.author_id) || rows[0].author_id, parseInt(req.body.book_id)|| rows[0].book_id, parseInt(req.body.prev_author_id), parseInt(req.body.prev_book_id)], (err, result)=>{
           if(err){
             console.error("Error updating Book Authors");
+            res.sendStatus(400);
+          }else{
+            // successfully found and modified row.
+            console.log("success", result);
+            res.sendStatus(200);
           }
-          // successfully found and modified row.
-          console.log("success", result);
-          res.send();
+
         });
       }
     });
@@ -926,26 +955,34 @@ app.put("/BookAuthors", (req, res)=>{
 
 
 app.delete("/BookAuthors", (req, res)=>{
-  mysql.pool.query(searchBookAuthors, [req.body.author_id || req.query.author_id, req.body.book_id || req.query.book_id], (err, result)=>{
-    if(err){
-      // error finding row
-      console.error("Error deleting row");
-      return;
-    }else{
-      if(result.length == 1){
-        // delete row from the table
-        mysql.pool.query(deleteBookAuthors, [req.body.author_id || req.query.author_id, req.body.book_id|| req.query.book_id], (err, result)=>{
-          if(err){
-            console.error("Error deleting");
-          }else{
-            // delete happened
-            console.log("Deleted!");
-            res.send();
-          }
-        });
+  if(!req.body){
+    console.error("No req body");
+    req.sendStatus(204);
+  }else{
+    mysql.pool.query(searchBookAuthors, [req.body.author_id || req.query.author_id, req.body.book_id || req.query.book_id], (err, result)=>{
+      if(err){
+        // error finding row
+        console.error("Error deleting row");
+        res.sendStatus(403);
+      }else{
+        console.log(result);
+        //if(result.length == 1){
+          // delete row from the table
+          mysql.pool.query(deleteBookAuthors, [req.body.author_id || req.query.author_id, req.body.book_id|| req.query.book_id], (err, result)=>{
+            if(err){
+              console.error("Error deleting");
+              res.sendStatus(403);
+            }else{
+              // delete happened
+              console.log("Deleted!");
+              res.sendStatus(200);
+            }
+          });
+        //}
       }
-    }
-  });
+    });
+  }
+
 });
 
 

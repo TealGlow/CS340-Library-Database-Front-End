@@ -41,7 +41,6 @@ const addAndValidateFormBooks = async ()=>{
 
 
     var data={
-      /*book_id:"",*/
       isbn:"",
       title:"",
       pages:"",
@@ -51,23 +50,21 @@ const addAndValidateFormBooks = async ()=>{
       on_shelf:""
     };
 
-    // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
-
     for(var i=0; i<temp.length; i++){
       data[temp[i].name] = await cleanData(temp[i].value);
     }
 
     data["publication"] = new Date(temp[3].value);
-    /*data["book_id"] = parseInt(data["book_id"]);*/
     data["section_id"] = parseInt(data["section_id"]);
     data["publisher_id"] = parseInt(data["publisher_id"]);
     data["pages"] = parseInt(data["pages"]);
     data["on_shelf"] = parseInt(data["on_shelf"]);
 
-    console.log(data);
+    if(data["section_id"] == 0 && data["publisher_id"]==0){
+      document.getElementById("data-add-error").innerHTML = "Please enter a valid id";
+    }
 
-
-    if(/*data["book_id"] == "" || */data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == ""){
+    if(data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == ""){
       console.log("Error please enter all data fields!");
       document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
     }else{
@@ -116,7 +113,7 @@ const validateFormBooks = async (i)=>{
 
 
   if(!data["isbn"] && !data["title"] && !data["pages"] && !data["publication"] && !data["publisher_id"] && !data["section_id"]){
-    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
   }else{
     // after data clean
     reqServer("PUT", "/booksTable", data);
@@ -188,7 +185,7 @@ const validateFormSections = async (i)=>{
 
 
   if(data["section_name"] == ""){
-    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
   }else{
     // after data clean
     console.log(data);
@@ -280,7 +277,7 @@ const validateFormPatrons = async (i)=>{
   data["phone"] = $(toSubmit)[0][3].value;
 
   if(!data["first_name"] && !data["last_name"] && !data["address"] && !data["phone"]){
-    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
   }else{
     // after data clean
     reqServer("PUT", "/patronsTable", data);
@@ -353,7 +350,7 @@ const validateFormPublishers = async (i)=>{
   }
 
   if(data["company_name"] == ""){
-    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
   }else{
     // after data clean
     reqServer("PUT", "/publishersTable", data);
@@ -430,7 +427,7 @@ const validateFormAuthors = async (i)=>{
 
 
   if(data["first_name"] == "" && data["last_name"] == ""){
-    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
   }else{
     // after data clean
     reqServer("PUT", "/authorsTable", data);
@@ -533,7 +530,7 @@ const validateFormCheckedOut = async (i)=>{
 
   if(!data["patron_id"] && !data["book_id"]){
     //nothing was entered
-    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
   }else{
     // after data clean
     reqServer("PUT", "/CheckedOutBooks", data);
@@ -616,7 +613,7 @@ const validateFormBookAuthors = async (i)=>{
 
   if(!data["author_id"] && !data["book_id"]){
     //nothing was entered
-    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
   }else{
     // after data clean
     reqServer("PUT", "/BookAuthors", data);
@@ -667,17 +664,25 @@ const reqServer = (reqType, loc, data)=>{
 
   // wait for the server to send data back
   req.addEventListener('load', ()=>{
-      if(req.status >= 200 && req.status < 400){
+      if(req.status == 204){
+        // no data sent
+        document.getElementById("data-add-error").innerHTML = "Error: No data sent.";
+      }else if(req.status == 304){
+        // data not modified
+        document.getElementById("data-add-error").innerHTML = "Error: Data not modified.";
+      }else if(req.status == 400){
+        // bad request
+        document.getElementById("data-add-error").innerHTML = "Error updating: please make sure that the foreign keys are correct.";
+      }else if(req.status >= 200 && req.status < 400){
         // success
         console.log("Update successful!");
-        var msg = document.getElementsByClassName("not-avail");
         alert("Success!");
         setTimeout(10);
         location.reload();
-        return;
       }else{
         // some sort of error happened
         console.log("Error requesting the server, check the end point!");
+        document.getElementById("data-add-error").innerHTML = "Error updating: Please check the server endpoint";
       }
   });
 
