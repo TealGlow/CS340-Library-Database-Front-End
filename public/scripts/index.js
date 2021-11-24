@@ -20,12 +20,6 @@ const getSearchInput = async () => {
 };
 
 
-window.onload =  ()=>{
-  document.getElementsByClassName("user-input").value="";
-
-};
-
-
 
 /*
 
@@ -120,8 +114,15 @@ const validateFormBooks = async (i)=>{
     data["on_shelf"] = 1;
   }
 
-  // after data clean
-  reqServer("PUT", "/booksTable", data);
+
+  if(!data["isbn"] && !data["title"] && !data["pages"] && !data["publication"] && !data["publisher_id"] && !data["section_id"]){
+    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+  }else{
+    // after data clean
+    reqServer("PUT", "/booksTable", data);
+  }
+
+
 
 };
 
@@ -155,7 +156,7 @@ const addAndValidateFormSections = async ()=>{
   for(var i=0; i<temp[0].length-1; i++){
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
-  if(data.section_name == ""){
+  if(data["section_name"] == ""){
     document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
 
   }else{
@@ -173,7 +174,7 @@ const validateFormSections = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
-  console.log(toSubmit["modify"].value);
+  console.log(temp[i]);
 
   var data={
     section_id:parseInt(toSubmit["modify"].value),
@@ -182,11 +183,12 @@ const validateFormSections = async (i)=>{
 
 
   for(var j=0; j<toSubmit.length; j++){
-    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+    data[toSubmit[j].name] = await cleanData(toSubmit[j].value);
   }
 
+
   if(data["section_name"] == ""){
-    console.log("Please enter a value");
+    document.getElementById("data-add-error").innerHTML = "Nothing to change";
   }else{
     // after data clean
     console.log(data);
@@ -277,9 +279,13 @@ const validateFormPatrons = async (i)=>{
   data["address"] = $(toSubmit)[0][2].value;
   data["phone"] = $(toSubmit)[0][3].value;
 
-  console.log(data);
-  // after data clean
-  reqServer("PUT", "/patronsTable", data);
+  if(!data["first_name"] && !data["last_name"] && !data["address"] && !data["phone"]){
+    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+  }else{
+    // after data clean
+    reqServer("PUT", "/patronsTable", data);
+  }
+
 };
 
 
@@ -346,10 +352,8 @@ const validateFormPublishers = async (i)=>{
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
 
-  //data["publisher_id"] = parseInt(data["publisher_id"]);
-
   if(data["company_name"] == ""){
-    console.log("No data edited");
+    document.getElementById("data-add-error").innerHTML = "Nothing to change";
   }else{
     // after data clean
     reqServer("PUT", "/publishersTable", data);
@@ -424,8 +428,9 @@ const validateFormAuthors = async (i)=>{
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
 
+
   if(data["first_name"] == "" && data["last_name"] == ""){
-    console.log("no data changed");
+    document.getElementById("data-add-error").innerHTML = "Nothing to change";
   }else{
     // after data clean
     reqServer("PUT", "/authorsTable", data);
@@ -434,7 +439,7 @@ const validateFormAuthors = async (i)=>{
 };
 
 
-
+/*
 const authorsTableUpdate = async (i) => {
     event.preventDefault();
 
@@ -457,7 +462,7 @@ const authorsTableUpdate = async (i) => {
     // Send request to the DB
     reqServer("POST", "/authorsTable", data);
 }
-
+*/
 
 
 const authorsTableRemoval = async (i)=>{
@@ -496,7 +501,6 @@ const addAndValidateFormCheckedOut = async ()=>{
 
   }else{
     // sending the data to the server
-
     reqServer("POST", "/CheckedOutBooks", data);
   }
 
@@ -526,8 +530,16 @@ const validateFormCheckedOut = async (i)=>{
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
-  // after data clean
-  reqServer("PUT", "/CheckedOutBooks", data);
+
+  if(!data["patron_id"] && !data["book_id"]){
+    //nothing was entered
+    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+  }else{
+    // after data clean
+    reqServer("PUT", "/CheckedOutBooks", data);
+  }
+
+
 };
 
 
@@ -601,8 +613,16 @@ const validateFormBookAuthors = async (i)=>{
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = parseInt(await cleanData($(toSubmit)[0][j].value));
   }
-  // after data clean
-  reqServer("PUT", "/BookAuthors", data);
+
+  if(!data["author_id"] && !data["book_id"]){
+    //nothing was entered
+    document.getElementById("data-add-error").innerHTML = "Nothing to change";
+  }else{
+    // after data clean
+    reqServer("PUT", "/BookAuthors", data);
+  }
+
+
 };
 
 
@@ -650,6 +670,9 @@ const reqServer = (reqType, loc, data)=>{
       if(req.status >= 200 && req.status < 400){
         // success
         console.log("Update successful!");
+        var msg = document.getElementsByClassName("not-avail");
+        alert("Success!");
+        setTimeout(10);
         location.reload();
         return;
       }else{

@@ -1,6 +1,7 @@
 <%- include ("../partials/header") %>
 
   <div class="myContainer table-container element-col">
+    <center><h1>Authors</h1></center>
     <%if(error!=""){%>
       <div class="not-avail"><%=error%></div>
     <%}%>
@@ -40,8 +41,8 @@
         <tr>
           <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormAuthors(<%=i%>)">
             <td><strong><%=data[i].author_id%></strong></td>
-            <td><input type="text" name="first_name" placeholder="<%=data[i].first_name%>"></td>
-            <td><input type="text" name="last_name" placeholder="<%=data[i].last_name%>"></td>
+            <td><input class="row-data-item" type="text" name="first_name" placeholder="<%=data[i].first_name%>"></td>
+            <td><input class="row-data-item" type="text" name="last_name" placeholder="<%=data[i].last_name%>"></td>
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].author_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
             <td><form onsubmit="authorsTableRemoval(<%= data[i].author_id %>)"><button value ="<%= data[i].author_id %>" type ="submit" class="btn btn-dark">Delete</button></form></td>

@@ -10,9 +10,56 @@ html,body{
   overflow: hidden;
 }
 
-::-moz-placeholder{
+
+
+.row-data-item:placeholder-shown{
   color:black;
+  opacity:1;
 }
+
+
+
+.row-data-item::-webkit-input-placeholder{
+  color:black;
+  opacity:1;
+}
+
+
+
+.row-data-item::-moz-placeholder{
+  color:black;
+  opacity:1;
+}
+
+
+
+.row-data-item::placeholder{
+  color:black;
+  opacity:1;
+}
+
+
+
+.row-data-item:-ms-input-placeholder{
+  color:black;
+  opacity:1;
+}
+
+
+
+.row-data-item::-ms-input-placeholder{
+  color:black;
+  opacity:1;
+}
+
+
+
+.row-data-item::placeholder{
+  color:black;
+  opacity:1;
+}
+
+
 
 .navbar{
   position:fixed;
@@ -51,9 +98,11 @@ html,body{
   width:100%;
 }
 
+
 .table-elements{
   align-self:center;
 }
+
 
 .myContainer{
   padding:100px;
@@ -61,6 +110,7 @@ html,body{
   width:100%;
   overflow-y: auto;
 }
+
 
 .search-container{
   margin-top:55px;
@@ -120,6 +170,8 @@ html,body{
   background-color:lightgray;
 }
 
+
+
 .single-item h1 {
     padding-top: 1rem;
 }
@@ -151,10 +203,20 @@ html,body{
 }
 
 
-input {
+/*input {
     width: 120px;
-}
+}*/
 
 .addData button {
     margin-top: 10px;
+}
+
+
+@media screen and (max-width:1500px){
+  table input{
+    width:120px;
+  }
+  table{
+    max-width:75%;
+  }
 }

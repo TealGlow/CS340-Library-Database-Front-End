@@ -33,7 +33,7 @@ const selectQuery = selectQ`SELECT * FROM ${tableName};`; // use this for all ta
 // insert queries
 const insertBooksQuery = `INSERT INTO Books (isbn, title, pages, publication, publisher_id, section_id, on_shelf) VALUES (?,?,?,?,?,?,?);`;
 const insertPatronsQuery = `INSERT INTO Patrons (first_name, last_name, address, phone) VALUES (?,?,?,?);`;
-const insertAuthorsQuery = `INSERT INTO Authors(first_name, last_name) VALUES(?, ?, ?);`;
+const insertAuthorsQuery = `INSERT INTO Authors(first_name, last_name) VALUES(?, ?);`;
 const insertSectionsQuery = `INSERT INTO Sections(section_name) VALUES(?);`;
 const insertPublishersQuery = `INSERT INTO Publishers (company_name) VALUES (?);`;
 const insertCheckedOutBooksQuery = `INSERT INTO CheckedOutBooks(patron_id, book_id) VALUES (?,?);`;
@@ -57,6 +57,7 @@ const deleteBookAuthors = `DELETE FROM BookAuthors WHERE author_id=? AND book_id
 const deleteCheckedOutBooksQuery = `DELETE FROM CheckedOutBooks WHERE patron_id=? AND book_id=?;`;
 
 
+// search queries
 function searchTitleQ(title) {
     return `SELECT title, first_name, last_name
             FROM Books
@@ -65,7 +66,7 @@ function searchTitleQ(title) {
             WHERE title = ${title};`;
 }
 
-// search queries
+
 const searchById = `SELECT * FROM ${tableName} WHERE ${idName}=?`;
 const searchCheckedOutBooks = `SELECT * FROM CheckedOutBooks WHERE patron_id=? AND book_id=?;`;
 const searchBookAuthors = `SELECT * FROM BookAuthors WHERE author_id=? AND book_id=?;`;
