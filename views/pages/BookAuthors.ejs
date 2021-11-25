@@ -1,6 +1,7 @@
 <%- include ("../partials/header") %>
 
   <div class="myContainer table-container element-col">
+    <center><h1>BookAuthors</h1></center>
     <%if(error!=""){%>
       <div class="not-avail"><%=error%></div>
     <%}%>
@@ -36,12 +37,12 @@
 
         <tr>
           <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormBookAuthors(<%=i%>)">
-            <td><input type="number" name="author_id" placeholder="<%=data[i].author_id%>"></td>
-            <td><input type="number" name="book_id" placeholder="<%=data[i].book_id%>"> </td>
+            <td><input class="row-data-item" type="number" name="author_id" placeholder="<%=data[i].author_id%>"></td>
+            <td><input class="row-data-item" type="number" name="book_id" placeholder="<%=data[i].book_id%>"> </td>
 
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].author_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
-          <td><form onsubmit="bookAuthorsTableRemoval(<%= data[i].author_id %>)"><button value ="<%= data[i].author_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+          <td><form onsubmit="bookAuthorsTableRemoval(<%= data[i].author_id %>, <%= data[i].book_id %>)"><button value ="<%= data[i].author_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
         </tr>
 
       <%}%>

@@ -20,12 +20,6 @@ const getSearchInput = async () => {
 };
 
 
-window.onload =  ()=>{
-  document.getElementsByClassName("user-input").value="";
-
-};
-
-
 
 /*
 
@@ -47,7 +41,6 @@ const addAndValidateFormBooks = async ()=>{
 
 
     var data={
-      book_id:"",
       isbn:"",
       title:"",
       pages:"",
@@ -57,23 +50,21 @@ const addAndValidateFormBooks = async ()=>{
       on_shelf:""
     };
 
-    // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
-
     for(var i=0; i<temp.length; i++){
       data[temp[i].name] = await cleanData(temp[i].value);
     }
 
-    data["publication"] = new Date(temp[4].value);
-    data["book_id"] = parseInt(data["book_id"]);
+    data["publication"] = new Date(temp[3].value);
     data["section_id"] = parseInt(data["section_id"]);
     data["publisher_id"] = parseInt(data["publisher_id"]);
     data["pages"] = parseInt(data["pages"]);
     data["on_shelf"] = parseInt(data["on_shelf"]);
-    console.log(temp);
-    console.log(data);
 
+    if(data["section_id"] == 0 && data["publisher_id"]==0){
+      document.getElementById("data-add-error").innerHTML = "Please enter a valid id";
+    }
 
-    if(data["book_id"] == "" || data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == ""){
+    if(data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == ""){
       console.log("Error please enter all data fields!");
       document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
     }else{
@@ -92,31 +83,26 @@ const validateFormBooks = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
-  // prev id
-  console.log(parseInt(toSubmit[toSubmit.length-1].value));
-  // row id
-  console.log(i);
+  console.log(toSubmit["modify"]);
 
   var data={
-    "book_id":"",
-    "isbn":"",
-    "title":"",
-    "pages":"",
-    "publication":"",
-    "publisher_id":"",
-    "section_id":"",
-    "on_shelf":"",
-    "prev_id":parseInt(toSubmit[toSubmit.length-1].value)
+    book_id:parseInt(toSubmit["modify"].value),
+    isbn:"",
+    title:"",
+    pages:"",
+    publication:"",
+    publisher_id:"",
+    section_id:"",
+    on_shelf:""
   };
 
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
-  data["book_id"] = parseInt(data["book_id"]);
   data["pages"] = parseInt(data["pages"]);
   data["publisher_id"] = parseInt(data["publisher_id"]);
   data["section_id"] = parseInt(data["section_id"]);
-  data["isbn"] = toSubmit[1].value;
+  data["isbn"] = toSubmit[0].value;
   data["publication"] = toSubmit[4].value;
 
   if(toSubmit[7].value == "0"){
@@ -125,8 +111,15 @@ const validateFormBooks = async (i)=>{
     data["on_shelf"] = 1;
   }
 
-  // after data clean
-  reqServer("PUT", "/booksTable", data);
+
+  if(!data["isbn"] && !data["title"] && !data["pages"] && !data["publication"] && !data["publisher_id"] && !data["section_id"]){
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  }else{
+    // after data clean
+    reqServer("PUT", "/booksTable", data);
+  }
+
+
 
 };
 
@@ -154,14 +147,13 @@ const addAndValidateFormSections = async ()=>{
   let temp = document.getElementsByClassName("addData");
   let toSubmit = temp;
   var data={
-    section_id:"",
     section_name:""
   };
 
   for(var i=0; i<temp[0].length-1; i++){
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
-  if(data.section_id == "" || data.section_name == ""){
+  if(data["section_name"] == ""){
     document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
 
   }else{
@@ -179,21 +171,28 @@ const validateFormSections = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
+  console.log(temp[i]);
+
   var data={
-    section_id:"",
-    section_name:"",
-    prev_id:parseInt(toSubmit[0].placeholder)
+    section_id:parseInt(toSubmit["modify"].value),
+    section_name:""
   };
 
 
-
-
   for(var j=0; j<toSubmit.length; j++){
-    data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
+    data[toSubmit[j].name] = await cleanData(toSubmit[j].value);
   }
 
-  // after data clean
-  reqServer("PUT", "/sectionsTable", data);
+
+  if(data["section_name"] == ""){
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  }else{
+    // after data clean
+    console.log(data);
+
+    reqServer("PUT", "/sectionsTable", data);
+  }
+
 };
 
 
@@ -223,23 +222,23 @@ const addAndValidateFormPatrons = async ()=>{
 
   let temp = document.getElementsByClassName("addData");
   var data={
-    patron_id:"",
     first_name:"",
     last_name:"",
     address:"",
     phone:""
   };
 
-  console.log(temp);
 
   // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
 
   for(var i=0; i<temp[0].length-1; i++){
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
-  data["phone"] = $(temp)[0][4].value;
+  data["phone"] = $(temp)[0][3].value;
 
-  if(data["patron_id"] == "" || data["first_name"] =="" || data["last_name"] == "" || data["address"] == "" || data["phone"] == ""){
+  console.log(data);
+
+  if(data["first_name"] =="" || data["last_name"] == "" || data["address"] == "" || data["phone"] == ""){
     console.log("Error please enter all data fields!");
     document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
   }else{
@@ -261,12 +260,11 @@ const validateFormPatrons = async (i)=>{
 
 
   var data={
-    "patron_id":"",
-    "first_name":"",
-    "last_name":"",
-    "address":"",
-    "phone":"",
-    "prev_id":parseInt(toSubmit[toSubmit.length-1].value)
+    patron_id:parseInt(toSubmit["modify"].value),
+    first_name:"",
+    last_name:"",
+    address:"",
+    phone:""
   };
 
 
@@ -275,12 +273,16 @@ const validateFormPatrons = async (i)=>{
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
 
-  data["address"] = $(toSubmit)[0][3].value;
-  data["phone"] = $(toSubmit)[0][4].value;
+  data["address"] = $(toSubmit)[0][2].value;
+  data["phone"] = $(toSubmit)[0][3].value;
 
-  console.log(data);
-  // after data clean
-  reqServer("PUT", "/patronsTable", data);
+  if(!data["first_name"] && !data["last_name"] && !data["address"] && !data["phone"]){
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  }else{
+    // after data clean
+    reqServer("PUT", "/patronsTable", data);
+  }
+
 };
 
 
@@ -308,17 +310,15 @@ const addAndValidateFormPublishers = async ()=>{
   let temp = document.getElementsByClassName("addData");
 
   var data={
-    publisher_id:"",
-    company_name:"",
+    company_name:""
   };
 
-  console.log(temp);
 
   for(var i=0; i<temp[0].length-1; i++){
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
 
-  if(data["publisher_id"] == "" || data["company_name"] =="" ){
+  if(data["company_name"] =="" ){
     console.log("Error please enter all data fields!");
     document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
   }else{
@@ -340,9 +340,8 @@ const validateFormPublishers = async (i)=>{
 
   console.log(i, toSubmit);
   var data={
-    publisher_id:"",
-    company_name:"",
-    prev_id:parseInt(toSubmit[0].placeholder)
+    publisher_id:parseInt(toSubmit["modify"].value),
+    company_name:""
   };
 
 
@@ -350,10 +349,13 @@ const validateFormPublishers = async (i)=>{
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
 
-  data["publisher_id"] = parseInt(data["publisher_id"]);
+  if(data["company_name"] == ""){
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  }else{
+    // after data clean
+    reqServer("PUT", "/publishersTable", data);
+  }
 
-  // after data clean
-  reqServer("PUT", "/publishersTable", data);
 };
 
 
@@ -380,7 +382,6 @@ const addAndValidateFormAuthors = async ()=>{
 
   let temp = document.getElementsByClassName("addData");
   var data={
-    author_id:"",
     first_name:"",
     last_name:""
   };
@@ -393,7 +394,7 @@ const addAndValidateFormAuthors = async ()=>{
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
 
-  if(data["author_id"] == "" || data["first_name"] ==""|| data["last_name"] =="" ){
+  if(data["first_name"] ==""|| data["last_name"] =="" ){
     console.log("Error please enter all data fields!");
     document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
   }else{
@@ -413,13 +414,10 @@ const validateFormAuthors = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
-  console.log("hello");
-
   var data={
-    author_id:"",
+    author_id:parseInt(toSubmit["modify"].value),
     first_name:"",
-    last_name:"",
-    prev_id:parseInt(toSubmit[0].placeholder)
+    last_name:""
   };
 
 
@@ -427,11 +425,18 @@ const validateFormAuthors = async (i)=>{
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
 
-  // after data clean
-  reqServer("PUT", "/authorsTable", data);
+
+  if(data["first_name"] == "" && data["last_name"] == ""){
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  }else{
+    // after data clean
+    reqServer("PUT", "/authorsTable", data);
+  }
+
 };
 
 
+/*
 const authorsTableUpdate = async (i) => {
     event.preventDefault();
 
@@ -454,6 +459,7 @@ const authorsTableUpdate = async (i) => {
     // Send request to the DB
     reqServer("POST", "/authorsTable", data);
 }
+*/
 
 
 const authorsTableRemoval = async (i)=>{
@@ -492,7 +498,6 @@ const addAndValidateFormCheckedOut = async ()=>{
 
   }else{
     // sending the data to the server
-
     reqServer("POST", "/CheckedOutBooks", data);
   }
 
@@ -522,15 +527,32 @@ const validateFormCheckedOut = async (i)=>{
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = await cleanData($(toSubmit)[0][j].value);
   }
-  // after data clean
-  reqServer("PUT", "/CheckedOutBooks", data);
+
+  if(!data["patron_id"] && !data["book_id"]){
+    //nothing was entered
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  }else{
+    // after data clean
+    reqServer("PUT", "/CheckedOutBooks", data);
+  }
+
+
 };
 
 
 
-const checkedOutTableRemoval = async (i)=>{
+const checkedOutTableRemoval = async (i, j)=>{
   event.preventDefault();
-  console.log("Delete", i);
+
+  let temp = document.getElementsByClassName("row-data");
+  let toSubmit = temp[i];
+
+  data={
+    patron_id:parseInt(i),
+    book_id:parseInt(j)
+  };
+
+  reqServer("DELETE", "/checkedOutBooks", data);
 };
 
 
@@ -588,15 +610,33 @@ const validateFormBookAuthors = async (i)=>{
   for(var j=0; j<toSubmit.length; j++){
     data[$(toSubmit)[0][j].name] = parseInt(await cleanData($(toSubmit)[0][j].value));
   }
-  // after data clean
-  reqServer("PUT", "/BookAuthors", data);
+
+  if(!data["author_id"] && !data["book_id"]){
+    //nothing was entered
+    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  }else{
+    // after data clean
+    reqServer("PUT", "/BookAuthors", data);
+  }
+
+
 };
 
 
 
-const bookAuthorsTableRemoval = async (i)=>{
+const bookAuthorsTableRemoval = async (i,j)=>{
   event.preventDefault();
-  console.log("Delete", i);
+
+  // i = author_id
+  // j = book_id
+  data={
+    author_id:parseInt(i),
+    book_id:parseInt(j)
+  };
+
+  console.log(data);
+
+  reqServer("DELETE", "/BookAuthors", data);
 };
 
 
@@ -624,14 +664,25 @@ const reqServer = (reqType, loc, data)=>{
 
   // wait for the server to send data back
   req.addEventListener('load', ()=>{
-      if(req.status >= 200 && req.status < 400){
+      if(req.status == 204){
+        // no data sent
+        document.getElementById("data-add-error").innerHTML = "Error: No data sent.";
+      }else if(req.status == 304){
+        // data not modified
+        document.getElementById("data-add-error").innerHTML = "Error: Data not modified.";
+      }else if(req.status == 400){
+        // bad request
+        document.getElementById("data-add-error").innerHTML = "Error updating: please make sure that the foreign keys are correct.";
+      }else if(req.status >= 200 && req.status < 400){
         // success
         console.log("Update successful!");
+        alert("Success!");
+        setTimeout(10);
         location.reload();
-        return;
       }else{
         // some sort of error happened
         console.log("Error requesting the server, check the end point!");
+        document.getElementById("data-add-error").innerHTML = "Error updating: Please check the server endpoint";
       }
   });
 

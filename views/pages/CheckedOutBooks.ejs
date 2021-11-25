@@ -1,6 +1,7 @@
 <%- include ("../partials/header") %>
 
   <div class="myContainer table-container element-col">
+    <center><h1>CheckedOutBooks</h1></center>
     <%if(error!=""){%>
       <div class="not-avail"><%=error%></div>
     <%}%>
@@ -35,12 +36,12 @@
 
         <tr>
           <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormCheckedOut(<%=i%>)">
-            <td><input type="number" name="patron_id" placeholder="<%=data[i].patron_id%>"></td>
-            <td><input type="number" name="book_id" placeholder="<%=data[i].book_id%>" > </td>
+            <td><input class="row-data-item" type="number" name="patron_id" placeholder="<%=data[i].patron_id%>"></td>
+            <td><input class="row-data-item" type="number" name="book_id" placeholder="<%=data[i].book_id%>" > </td>
 
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].patron_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
-          <td><form onsubmit="checkedOutTableRemoval(<%= data[i].patron_id %>)"><button value ="<%= data[i].patron_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
+          <td><form onsubmit="checkedOutTableRemoval(<%= data[i].patron_id %>,<%= data[i].book_id %>)"><button value ="<%= data[i].patron_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
         </tr>
 
       <%}%>

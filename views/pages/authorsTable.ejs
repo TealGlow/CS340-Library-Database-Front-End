@@ -1,14 +1,15 @@
 <%- include ("../partials/header") %>
 
   <div class="myContainer table-container element-col">
+    <center><h1>Authors</h1></center>
     <%if(error!=""){%>
       <div class="not-avail"><%=error%></div>
     <%}%>
     <!-- form to add data -->
     <div class="form-container center">
       <form class="addData element-col" onSubmit="addAndValidateFormAuthors()">
-        <label for="author_id">author_id:</label>
-        <input type="number" name="author_id" class="form-control">
+        <!--<label for="author_id">author_id:</label>
+        <input type="number" name="author_id" class="form-control">-->
 
         <label for="first_name">first_name:</label>
         <input type="text" name="first_name" class="form-control">
@@ -39,9 +40,9 @@
 
         <tr>
           <form class="row-data" id="row-data-<%=i%>" value="<%=i%>" onsubmit="validateFormAuthors(<%=i%>)">
-            <td><input type="number" name="author_id" placeholder="<%=data[i].author_id%>"></td>
-            <td><input type="text" name="first_name" placeholder="<%=data[i].first_name%>"></td>
-            <td><input type="text" name="last_name" placeholder="<%=data[i].last_name%>"></td>
+            <td><strong><%=data[i].author_id%></strong></td>
+            <td><input class="row-data-item" type="text" name="first_name" placeholder="<%=data[i].first_name%>"></td>
+            <td><input class="row-data-item" type="text" name="last_name" placeholder="<%=data[i].last_name%>"></td>
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].author_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
             <td><form onsubmit="authorsTableRemoval(<%= data[i].author_id %>)"><button value ="<%= data[i].author_id %>" type ="submit" class="btn btn-dark">Delete</button></form></td>
