@@ -18,11 +18,35 @@ up during the fall term of 2021.
 
 ## Table of contents:
 
+- [About this website](#About-This-Website)
+- [How to use](#How-to-use)
 - [Project Description](#Library-Database-Front-end)
 - [Database Overview](#Database-Overview)
 - [Database Outline](#Database-Outline)
 - [Entity-Relationship Diagram](#Entity-Relationship-Diagram)
 - [Schema](#Schema)
+
+## About This Website:
+
+Simple Library website that contains a page for each table.  Follows the CRUD operations on each table.  So, each page allows the user to Create, Read, Update, and Delete for each table in the database.
+
+Built in a Node.js / Express server using EJS for templating.
+
+
+## How to use:
+- Download the repo and place it in the directory you wish to work in.
+- Create a .env file in the same directory as app.js and dbcon.js and place the credentials of the MySQL database into it.  You need to have your database set up like ours.
+  - Your .env should look like:
+    ```
+    CONNECTIONLIMIT=10
+    HOST=host_name_here
+    USER=username_here
+    PASSWORD=password_here
+    DATABASE=database_name_here
+    ```
+- Run the command ```npm install``` to download all the node modules needed.
+- Run the command ```node app.js```
+- Go to the localhost on the port that is specified when the app is run.
 
 
 ## Database Overview:
