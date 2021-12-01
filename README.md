@@ -102,3 +102,7 @@ This is a medium-sized library and the database should be able to handle a colle
 
 
 ## Entity-Relationship Diagram:
+![ERD](https://github.com/TealGlow/Library-Database-Front-End/blob/master/digrams/Intro%20to%20databases%20-%20project%20draft%20-%20Page%201(6).png)
+
+## Schema:
+![Schema](https://github.com/TealGlow/Library-Database-Front-End/blob/master/digrams/Intro%20to%20databases%20-%20project%20draft%20-%20Page%202(10).png)
