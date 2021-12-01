@@ -18,10 +18,11 @@ up during the fall term of 2021.
 
 ## Table of contents:
 
-- [Project Description](Library-Database-Front-end)
-- [Database Overview](Database-Overview)
-- [Database Outline](Database-Outline)
-- [Entity-Relationship Diagram](Entity-Relationship-Diagram)
+- [Project Description](#Library-Database-Front-end)
+- [Database Overview](#Database-Overview)
+- [Database Outline](#Database-Outline)
+- [Entity-Relationship Diagram](#Entity-Relationship-Diagram)
+- [Schema](#Schema)
 
 
 ## Database Overview:
