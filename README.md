@@ -18,9 +18,9 @@ up during the fall term of 2021.
 
 ## Table of contents:
 
+- [Project Description](#Library-Database-Front-end)
 - [About this website](#About-This-Website)
 - [How to use](#How-to-use)
-- [Project Description](#Library-Database-Front-end)
 - [Database Overview](#Database-Overview)
 - [Database Outline](#Database-Outline)
 - [Entity-Relationship Diagram](#Entity-Relationship-Diagram)
