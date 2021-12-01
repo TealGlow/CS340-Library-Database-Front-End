@@ -79,9 +79,6 @@
               }
 
               let mdy = String(month)+ "/"+ String(day) +"/"+ String(pub_date.getFullYear());
-
-              console.log(data[i].on_shelf);
-
             %>
             <td><label for="publication"> <%=mdy%> </label><input type = "date" name="publication"> </td>
             <td><input class="row-data-item" type="number" name="publisher_id" placeholder="<%=data[i].publisher_id%>" ></td>

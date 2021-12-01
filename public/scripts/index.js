@@ -83,8 +83,6 @@ const validateFormBooks = async (i)=>{
   let temp = document.getElementsByClassName("row-data");
   let toSubmit = temp[i];
 
-  console.log(toSubmit["modify"]);
-
   var data={
     book_id:parseInt(toSubmit["modify"].value),
     isbn:"",
@@ -105,21 +103,15 @@ const validateFormBooks = async (i)=>{
   data["isbn"] = toSubmit[0].value;
   data["publication"] = toSubmit[4].value;
 
-  if(toSubmit[7].value == "0"){
+  if(toSubmit[6].value == "0"){
     data["on_shelf"] = 0;
   }else{
     data["on_shelf"] = 1;
   }
 
 
-  if(!data["isbn"] && !data["title"] && !data["pages"] && !data["publication"] && !data["publisher_id"] && !data["section_id"]){
-    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
-  }else{
-    // after data clean
-    reqServer("PUT", "/booksTable", data);
-  }
-
-
+  // after data is cleaned
+  reqServer("PUT", "/booksTable", data);
 
 };
 
