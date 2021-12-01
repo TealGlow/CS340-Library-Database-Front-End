@@ -20,7 +20,8 @@ up during the fall term of 2021.
 
 - [Project Description](#Library-Database-Front-end)
 - [About this website](#About-This-Website)
-- [How to use](#How-to-use)
+- [How to use Website](#How-to-use-Website)
+- [How to set up the Database](#How-to-set-up-the-Database)
 - [Database Overview](#Database-Overview)
 - [Database Outline](#Database-Outline)
 - [Entity-Relationship Diagram](#Entity-Relationship-Diagram)
@@ -33,7 +34,7 @@ Simple Library website that contains a page for each table.  Follows the CRUD op
 Built in a Node.js / Express server using EJS for templating.
 
 
-## How to use:
+## How to use Website:
 - Download the repo and place it in the directory you wish to work in.
 - Create a .env file in the same directory as app.js and dbcon.js and place the credentials of the MySQL database into it.  You need to have your database set up like ours.
   - Your .env should look like:
@@ -47,6 +48,11 @@ Built in a Node.js / Express server using EJS for templating.
 - Run the command ```npm install``` to download all the node modules needed.
 - Run the command ```node app.js```
 - Go to the localhost on the port that is specified when the app is run.
+
+
+## How to set up the Database:
+
+Run all the queries contained in [db-defining-queries/db_defining.sql](https://github.com/TealGlow/CS340-Library-Database-Front-End/blob/master/db-defining-queries/db_defining.sql)
 
 
 ## Database Overview:
