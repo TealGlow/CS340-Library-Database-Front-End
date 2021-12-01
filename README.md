@@ -21,7 +21,7 @@ up during the fall term of 2021.
 - [Project Description](Library-Database-Front-end)
 - [Database Overview](Database-Overview)
 - [Database Outline](Database-Outline)
-
+- [Entity-Relationship Diagram](Entity-Relationship-Diagram)
 
 
 ## Database Overview:
@@ -99,3 +99,6 @@ This is a medium-sized library and the database should be able to handle a colle
 #### Relationships:
 - M:1 Relationship with Patrons using patron_id as a foreign key from Patrons.
 - M:1 relationship with Books using book_id as a foreign key from Books.
+
+
+## Entity-Relationship Diagram:
