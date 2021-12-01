@@ -19,9 +19,83 @@ up during the fall term of 2021.
 ## Table of contents:
 
 - [Project Description](Library-Database-Front-end)
-
 - [Database Overview](Database-Overview)
+- [Database Outline](Database-Outline)
 
 
 
 ## Database Overview:
+A new library is opening up in your town. This library will hold thousands of books by thousands of authors. These books will be printed by many different publishers and they will be organized in many discrete sections of the library according to their genre. A large portion of the population of your town will frequent this library to check out and return books. An operation such as this requires a database to keep track of a lot of information. Patrons will want to know if the library has a certain book on the shelf and then find that book in the proper section. The library will need a system in place for managing their inventory and tracking who has which books.
+
+This is a medium-sized library and the database should be able to handle a collection of 200,000 books. Suppose your town has an adult population of 150,000; the library will therefore need to handle up to 150,000 registered library patrons. Examples of information that can be accessed through database queries include: Does a specific book exist at the library? How many books by a given author are available? Is a given book on the shelf or checked out?
+
+
+## Database Outline:
+### Books - contains details about the library books.
+- book_id         int   not NULL   unique   auto_increment   PK
+- publisher_id        int   not NULL   FK
+- section_id         int   not NULL   FK
+- title            varchar   not NULL
+- isbn             int   not NULL
+- pages         int   not NULL
+- publication         date/time   not NULL
+- on_shelf        bool   not NULL
+
+#### Relationships: 
+- M:M Relationship to Authors using BookAuthors as an intersection.
+- 1:M Relationship between Books and BookAuthors using the book_id as a foreign key in the BookAuthors table.
+- M:1 Relationship to Publishers. Using publisher_id as a foreign key.
+- M:1 Relationship to Sections. Using section_id as a foreign key.
+- M:M Relationship with Patrons 
+- 1:M relationship between Books and CheckedOutBooks as an intersection table.
+
+### Authors - contains details about the authors of the library books.
+- author_id        int   not NULL   unique   auto_increment   PK
+- first_name         varchar   not NULL
+- last_name        varchar   not NULL
+
+#### Relationships:
+- M:M Relationship between Authors and Books using BookAuthors as an intersection.
+- 1:M Relationship between Authors and BookAuthors using author_id as a foreign key in the BookAuthors table.
+
+### BookAuthors - intersection between Books and Authors.
+- author_id        int   not NULL   FK
+- book_id        int   not NULL   FK
+
+#### Relationships:
+- M:1 Relationship between BookAuthors and Authors using author_id as a foreign key in the BookAuthors table.
+- M:1 Relationship between BookAuthors and Books table using book_id as a foreign id in the BookAuthors table.
+
+### Publishers - contains details about publishers of library books.
+- publisher_id        int   not NULL   unique   auto_increment   PK
+- company_name     varchar   not NULL
+
+#### Relationships:
+- 1:M Relationship between Publishers and Books using publisher_id as a foreign key in the Books table.
+
+
+### Sections - contains details about the section library books are kept in.
+- section_id        int   not NULL   unique   auto_increment   PK
+- section_name    varchar   not NULL
+
+#### Relationships:
+- 1:M Relationship between Sections and Books using section_id as a foreign key in the Books table.
+
+### Patrons - contains details about library customers.
+- patron_id        int   not NULL   unique   auto_increment   PK
+- first_name        varchar   not NULL
+- last_name        varchar   not NULL
+- address        varchar   not NULL
+- phone         varchar   not NULL
+
+#### Relationships:
+- M:M relationship between Patrons and Books using CheckedOutBooks as an intersection table.
+- 1:M relationship with CheckedOutBooks intersection table.    
+
+### CheckedOutBooks - intersection between Books and Patrons
+- patron_id         int   not NULL   FK
+- book_id        int   not NULL   FK
+
+#### Relationships:
+- M:1 Relationship with Patrons using patron_id as a foreign key from Patrons.
+- M:1 relationship with Books using book_id as a foreign key from Books.
