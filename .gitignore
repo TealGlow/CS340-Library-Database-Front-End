@@ -1,4 +1,7 @@
 ./node_modules
 /node_modules
 
+/PAPER_PROTOTYPE_FOR_REFERENCE
+./PAPER_PROTOTYPE_FOR_REFERENCE
+
 .env
