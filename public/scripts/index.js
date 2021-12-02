@@ -64,7 +64,8 @@ const addAndValidateFormBooks = async ()=>{
       document.getElementById("data-add-error").innerHTML = "Please enter a valid id";
     }
 
-    if(data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || data["publication"] == "" || data["publisher_id"] == "" || data["section_id"] == ""){
+
+    if(data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || isNaN(data["publication"].getTime()) || data["publisher_id"] == "" || data["section_id"] == ""){
       console.log("Error please enter all data fields!");
       document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
     }else{
@@ -100,8 +101,8 @@ const validateFormBooks = async (i)=>{
   data["pages"] = parseInt(data["pages"]);
   data["publisher_id"] = parseInt(data["publisher_id"]);
   data["section_id"] = parseInt(data["section_id"]);
-  data["isbn"] = toSubmit[0].value;
-  data["publication"] = toSubmit[4].value;
+  data["isbn"] = parseInt(data["isbn"]);
+  data["publication"] = new Date(toSubmit[4].value);
 
   if(toSubmit[6].value == "0"){
     data["on_shelf"] = 0;
