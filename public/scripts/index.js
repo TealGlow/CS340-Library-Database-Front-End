@@ -60,19 +60,29 @@ const addAndValidateFormBooks = async ()=>{
     data["pages"] = parseInt(data["pages"]);
     data["on_shelf"] = parseInt(data["on_shelf"]);
 
+    // validation for section_id
     if(data["section_id"] == 0 && data["publisher_id"]==0){
       document.getElementById("data-add-error").innerHTML = "Please enter a valid id";
     }
 
-
-    if(data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || isNaN(data["publication"].getTime()) || data["publisher_id"] == "" || data["section_id"] == ""){
-      console.log("Error please enter all data fields!");
-      document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+    //validation for isbn
+    if(data["isbn"].toString().length != 13 || data["isbn"] != parseInt(data["isbn"])){
+      // isbns are usually 13 digits
+      document.getElementById("data-add-error").innerHTML = "ISBN is not the correct format.";
     }else{
-      // else we did it and we can send the data to the db!
-      // send a request to the db
-      reqServer("POST", "/booksTable", data);
+      if(data["isbn"] =="" || data["title"] == "" || data["pages"] == "" || isNaN(data["publication"].getTime()) || data["publisher_id"] == "" || data["section_id"] == ""){
+        console.log("Error please enter all data fields!");
+        document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+      }else{
+        // else we did it and we can send the data to the db!
+        // send a request to the db
+        reqServer("POST", "/booksTable", data);
+      }
     }
+
+
+
+
 
 };
 
@@ -110,9 +120,19 @@ const validateFormBooks = async (i)=>{
     data["on_shelf"] = 1;
   }
 
+  // isbn form validation
+  if(data["isbn"] && data["isbn"].toString().length != 13){
+    // isbns are usually 13 digits
+    document.getElementById("data-add-error").innerHTML = "ISBN is not the correct format.";
+  }else if(data["isbn"] && data["isbn"] != parseInt(data["isbn"])){
+    document.getElementById("data-add-error").innerHTML = "ISBN is not the correct format.";
+  }else{
+    // after data is cleaned
+    reqServer("PUT", "/booksTable", data);
+  }
 
-  // after data is cleaned
-  reqServer("PUT", "/booksTable", data);
+
+
 
 };
 
@@ -227,20 +247,23 @@ const addAndValidateFormPatrons = async ()=>{
   for(var i=0; i<temp[0].length-1; i++){
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
-  data["phone"] = $(temp)[0][3].value;
+  data["phone"] = parseInt($(temp)[0][3].value);
 
-  console.log(data);
-
-  if(data["first_name"] =="" || data["last_name"] == "" || data["address"] == "" || data["phone"] == ""){
-    console.log("Error please enter all data fields!");
-    document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+  //phone number form VALIDATION
+  console.log(data["phone"].toString().length);
+  if(data["phone"].toString().length != 10){
+      // we want a 10 digit phone number with area code ex: 5035555555
+      document.getElementById("data-add-error").innerHTML = "Phone number format incorrect, please enter a 10 digit phone number with area code.";
   }else{
-    // else we did it and we can send the data to the db!
-    // send a request to the db
-    reqServer("POST", "/patronsTable", data);
+    if(data["first_name"] =="" || data["last_name"] == "" || data["address"] == "" || data["phone"] == ""){
+      console.log("Error please enter all data fields!");
+      document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
+    }else{
+      // else we did it and we can send the data to the db!
+      // send a request to the db
+      reqServer("POST", "/patronsTable", data);
+    }
   }
-
-
 };
 
 
@@ -267,14 +290,21 @@ const validateFormPatrons = async (i)=>{
   }
 
   data["address"] = $(toSubmit)[0][2].value;
-  data["phone"] = $(toSubmit)[0][3].value;
+  data["phone"] = parseInt($(toSubmit)[0][3].value);
 
-  if(!data["first_name"] && !data["last_name"] && !data["address"] && !data["phone"]){
-    document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+  //phone number VALIDATION
+  if(data["phone"] && data["phone"].toString().length != 10){
+    // incorrect phone number
+      document.getElementById("data-add-error").innerHTML = "Phone number format incorrect, please enter a 10 digit phone number with area code.";
   }else{
-    // after data clean
-    reqServer("PUT", "/patronsTable", data);
+    if(!data["first_name"] && !data["last_name"] && !data["address"] && !data["phone"]){
+      document.getElementById("data-add-error").innerHTML = "Please check that all your fields are correct.";
+    }else{
+      // after data clean
+      reqServer("PUT", "/patronsTable", data);
+    }
   }
+
 
 };
 
@@ -311,7 +341,7 @@ const addAndValidateFormPublishers = async ()=>{
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
 
-  if(data["company_name"] =="" ){
+  if(data["company_name"] == ""){
     console.log("Error please enter all data fields!");
     document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
   }else{
@@ -379,15 +409,12 @@ const addAndValidateFormAuthors = async ()=>{
     last_name:""
   };
 
-  console.log(temp);
-
-  // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
 
   for(var i=0; i<temp[0].length-1; i++){
     data[$(temp)[0][i].name] = await cleanData($(temp)[0][i].value);
   }
 
-  if(data["first_name"] ==""|| data["last_name"] =="" ){
+  if(data["first_name"] == "" || data["last_name"] == ""){
     console.log("Error please enter all data fields!");
     document.getElementById("data-add-error").innerHTML = "Please enter all fields.";
   }else{
@@ -428,31 +455,6 @@ const validateFormAuthors = async (i)=>{
 
 };
 
-
-/*
-const authorsTableUpdate = async (i) => {
-    event.preventDefault();
-
-
-    let rowData = document.getElementsByClassName("row-data");
-    var data = {
-        author_id: "",
-        first_name: "",
-        last_name: ""
-    };
-
-    // TODO: CLEAN PUBLICATION WITHOUT BLASTING THE DATA
-
-    console.log(rowData[0][0]);
-
-    for (var i = 0; i < update[0].length - 1; i++) {
-        data[$(update)[0][i].name] = $(update)[0][i].value;
-    }
-
-    // Send request to the DB
-    reqServer("POST", "/authorsTable", data);
-}
-*/
 
 
 const authorsTableRemoval = async (i)=>{

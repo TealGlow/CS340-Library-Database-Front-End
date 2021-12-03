@@ -20,7 +20,7 @@
         <input type="address" name="address" class="form-control">
 
         <label>phone:</label>
-        <input  type = "tel" name="phone" class="form-control">
+        <input  type = "number" name="phone" class="form-control">
 
         <button class="btn btn-dark" type="Submit">Add</button>
         <div class="not-avail" id="data-add-error"></div>
@@ -51,7 +51,7 @@
             <td><input  class="user-input row-data-item" type="text" name="first_name" placeholder="<%=data[i].first_name%>"> </td>
             <td><input class="user-input row-data-item" type = "text" name="last_name" placeholder="<%=data[i].last_name%>"> </td>
             <td><input class="user-input row-data-item" type="address" name="address" placeholder="<%=data[i].address%>"> </td>
-            <td><input class="user-input row-data-item" type = "tel" name="phone" placeholder="<%=data[i].phone%>"> </td>
+            <td><input class="user-input row-data-item" type = "number" name="phone" placeholder="<%=data[i].phone%>"> </td>
             <td><button class="btn btn-dark" name="modify" value="<%=data[i].patron_id%>" type = "submit" class="btn btn-dark">Modify</button></td>
           </form>
           <td><form onsubmit="patronsTableRemoval(<%= data[i].patron_id %>)"><button value ="<%= data[i].patron_id %>" type ="submit"  class="btn btn-dark">Delete</button></form></td>
