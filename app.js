@@ -124,14 +124,6 @@ function setDeleteQuery(tblName, idName){
 
 
 
-const getSectionIds = async function (p){
-  const results = await mysql.pool.query(`SELECT section_id FROM Sections;`);
-  console.log(results);
-  p.resolve(results);
-}
-
-
-
 /*
     FUNCTIONS TO HANDLE THE MAIN PAGE OF THE WEBSITE
     when user goes to the path "/" they will be redirected to the path
